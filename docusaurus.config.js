@@ -103,6 +103,11 @@ const config = {
             label: 'Topics',
           },
           {
+            to: '/docs/question-bank/kafka',
+            label: 'Question Bank',
+            position: 'left',
+          },
+          {
             href: `https://github.com/${organizationName}/${projectName}`,
             label: 'GitHub',
             position: 'right',

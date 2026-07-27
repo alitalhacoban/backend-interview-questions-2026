@@ -21,6 +21,11 @@ function HomepageHeader() {
             to="/docs/kafka/fundamentals">
             Start with Kafka →
           </Link>
+          <Link
+            className="button button--secondary button--lg"
+            to="/docs/question-bank/kafka">
+            Browse the Question Bank →
+          </Link>
         </div>
       </div>
     </header>
