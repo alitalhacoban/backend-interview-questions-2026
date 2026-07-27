@@ -1,0 +1,85 @@
+# Backend Interview Questions 2026
+
+A self-hosted, growing reference for backend engineering interview preparation, built with
+[Docusaurus](https://docusaurus.io/). Each topic explains the underlying mechanics of a
+technology or pattern, not just the vocabulary, and pairs the explanation with diagrams, real
+Java/Spring Boot code examples, and a set of interview questions the page prepares you to answer.
+
+It's aimed at backend developers with roughly 0-2 years of experience preparing for interviews
+that go beyond surface-level definitions, but should be a useful refresher for anyone.
+
+Live site: `https://alitalhacoban.github.io/backend-interview-questions-2026/`
+
+## What's covered so far
+
+- **Kafka** &mdash; architecture and fundamentals, producer internals, consumer groups and
+  rebalancing, delivery semantics, replication and ISR, the outbox/inbox pattern, and common
+  production pitfalls.
+
+More topics (Spring Boot, PostgreSQL, Redis, distributed systems, API security, and others) will
+be added over time. This is a living project: expect new topics and new questions to show up on
+existing pages as the content grows.
+
+## Running locally
+
+Requires Node.js 20+.
+
+```bash
+npm install
+npm start
+```
+
+This starts the local dev server (with live reload) at `http://localhost:3000/backend-interview-questions-2026/`.
+
+To produce a static production build:
+
+```bash
+npm run build
+npm run serve
+```
+
+## Content structure
+
+All content lives under `docs/`, organized as one folder per topic:
+
+```
+docs/
+  kafka/
+    _category_.json          # sidebar label + ordering for the topic
+    01-fundamentals.md
+    02-producer-internals.md
+    03-consumer-and-groups.md
+    04-delivery-semantics.md
+    05-replication-and-isr.md
+    06-outbox-and-inbox-pattern.md
+    07-common-pitfalls.md
+```
+
+- Sidebar ordering is controlled by numeric filename prefixes (`01-`, `02-`, ...).
+- Each topic folder has its own `_category_.json` controlling its sidebar label and position.
+- The sidebar (`sidebars.js`) auto-generates from this folder structure, so a new topic folder
+  with its own `_category_.json` shows up automatically &mdash; no config changes required.
+- Diagrams use [Mermaid](https://mermaid.js.org/) (via `@docusaurus/theme-mermaid`), rendered
+  directly from fenced ` ```mermaid ` code blocks in Markdown.
+- Search is local/offline (via `@easyops-cn/docusaurus-search-local`) &mdash; no external service
+  or account required.
+- Internationalization is configured (`i18n.defaultLocale: 'en'`) so additional locales can be
+  added later without restructuring, though only English content exists today.
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the site and deploys it
+to GitHub Pages via GitHub Actions. In the repository's **Settings → Pages**, the source must be
+set to **GitHub Actions** for this to work.
+
+## Contributing
+
+This is primarily a personal study reference, but corrections, clarifications, and new topics are
+welcome:
+
+1. Fork the repo and create a branch for your change.
+2. Follow the existing content structure for any new page: short intro, concept explanation, a
+   diagram where it helps, a realistic code example, and an "Interview Questions" callout at the
+   end.
+3. Run `npm start` locally and confirm the page renders as expected before opening a PR.
+4. Open a pull request describing what you added or changed and why.

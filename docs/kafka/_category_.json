@@ -1,0 +1,8 @@
+{
+  "label": "Kafka",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Apache Kafka internals, patterns, and pitfalls for backend engineering interviews."
+  }
+}
