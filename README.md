@@ -58,7 +58,7 @@ docs/
     07-common-pitfalls.md
   question-bank/
     _category_.json          # pinned to the bottom of the sidebar (position: 100)
-    kafka.mdx                # every Kafka question in one place, grouped like the pages above
+    kafka.mdx                # every Kafka question with its answer, grouped by subtopic
 ```
 
 - Sidebar ordering is controlled by numeric filename prefixes (`01-`, `02-`, ...).
@@ -67,9 +67,13 @@ docs/
   with its own `_category_.json` shows up automatically &mdash; no config changes required.
 - Each page's "Interview Questions" callout is single-sourced: the bullet list lives in a partial
   file under that topic's `_partials/` folder (ignored by Docusaurus routing because of the `_`
-  prefix) and is imported both by the explanation page and by the corresponding page under
-  `question-bank/`. Edit the question in the partial once and both places update &mdash; there's
-  never a second copy to keep in sync.
+  prefix) and is imported by the explanation page. This is where the *question-only* prompt right
+  after the explanation lives.
+- `question-bank/<topic>.mdx` is a separate, hand-written page: a question followed immediately by
+  a short answer, for every question on the site, grouped by subtopic with one link per group back
+  to the full explanation. It exists for quick self-testing without re-reading the prose, so its
+  content is intentionally not generated from the `_partials/` files &mdash; the answers there are
+  condensed summaries, not duplicates of the full explanation.
 - Diagrams use [Mermaid](https://mermaid.js.org/) (via `@docusaurus/theme-mermaid`), rendered
   directly from fenced ` ```mermaid ` code blocks in Markdown.
 - Search is local/offline (via `@easyops-cn/docusaurus-search-local`) &mdash; no external service
@@ -94,9 +98,9 @@ welcome:
    end. Put the questions themselves in a partial under that topic's `_partials/` folder and
    import it into the callout (see `docs/kafka/_partials/` for the pattern) &mdash; don't inline
    the bullet list directly in the page.
-3. Add the same questions to the topic's page under `docs/question-bank/` (create it, following
-   `docs/question-bank/kafka.mdx`, if this is a brand-new topic folder) by importing the same
-   partial, so the quick-reference list stays complete.
+3. Add the same question to `docs/question-bank/<topic>.mdx` (create it, following
+   `docs/question-bank/kafka.mdx`, if this is a brand-new topic folder), directly followed by a
+   short answer, in the subtopic's section.
 4. Run `npm start` locally and confirm both the page and its Question Bank entry render as
    expected before opening a PR.
 5. Open a pull request describing what you added or changed and why.
