@@ -3,6 +3,8 @@ title: Producer Internals
 sidebar_label: Producer Internals
 ---
 
+import ProducerInternalsQuestions from './_partials/02-producer-internals-questions.mdx';
+
 # Producer Internals
 
 Producer configuration is where most "we lost messages in production" incidents trace back to.
@@ -141,10 +143,5 @@ public class PaymentEventPublisher {
 ```
 
 :::info Interview Questions
-- Walk through what happens internally between calling `send()` and a record actually reaching the broker.
-- What's the tradeoff of increasing `linger.ms`, and when would you do it?
-- What are the durability differences between `acks=0`, `acks=1`, and `acks=all`?
-- How does the default partitioner decide where a keyed record goes, versus a key-less one?
-- What problem does the idempotent producer solve, and what configuration does it require?
-- Does an idempotent producer give you exactly-once semantics end-to-end? Why or why not?
+<ProducerInternalsQuestions/>
 :::

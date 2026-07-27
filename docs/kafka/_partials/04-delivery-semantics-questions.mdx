@@ -1,0 +1,6 @@
+- Describe a concrete scenario where at-most-once delivery results in data loss.
+- Describe a concrete scenario where at-least-once delivery results in duplicate processing.
+- How does Kafka implement exactly-once semantics for a consume-transform-produce pipeline?
+- Why is Kafka's exactly-once guarantee limited to "within Kafka," and what breaks it?
+- What does `isolation.level=read_committed` actually change about what a consumer sees?
+- If your pipeline writes to an external database as its final step, how would you achieve effectively-once behavior?

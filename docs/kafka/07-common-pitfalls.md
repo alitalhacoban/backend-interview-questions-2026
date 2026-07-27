@@ -3,6 +3,8 @@ title: Common Pitfalls
 sidebar_label: Common Pitfalls
 ---
 
+import CommonPitfallsQuestions from './_partials/07-common-pitfalls-questions.mdx';
+
 # Common Pitfalls
 
 This page ties together the previous topics through the lens of what actually breaks in
@@ -132,11 +134,5 @@ Treating "duplicates shouldn't happen" as the goal, instead of "duplicates shoul
 when they happen," is the most common design mistake interviewers look for here.
 
 :::info Interview Questions
-- What causes a rebalancing storm, and how does `CooperativeStickyAssignor` help?
-- Why does `max.poll.interval.ms` matter even though the consumer's heartbeat thread is still alive?
-- What is a poison pill message, and why can it block an entire partition rather than just one message?
-- How does a Dead Letter Topic prevent a poison pill from stalling a consumer group?
-- What is consumer lag, and what are the main things you'd check first if it started climbing?
-- Why should you generally assume duplicate message processing will happen, rather than try to prevent it entirely?
-- How would you make a consumer's side effect (e.g. charging a customer) idempotent against redelivery?
+<CommonPitfallsQuestions/>
 :::

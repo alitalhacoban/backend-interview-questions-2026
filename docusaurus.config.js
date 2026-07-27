@@ -119,6 +119,10 @@ const config = {
                 label: 'Kafka',
                 to: '/docs/kafka/fundamentals',
               },
+              {
+                label: 'Question Bank',
+                to: '/docs/question-bank/kafka',
+              },
             ],
           },
           {

@@ -3,6 +3,8 @@ title: Kafka Fundamentals
 sidebar_label: Fundamentals
 ---
 
+import FundamentalsQuestions from './_partials/01-fundamentals-questions.mdx';
+
 # Kafka Fundamentals
 
 Kafka questions show up in almost every backend interview involving distributed systems, and
@@ -177,10 +179,5 @@ public class OrderEventListener {
 ```
 
 :::info Interview Questions
-- What is the actual unit of parallelism and ordering in Kafka, and why isn't it the topic?
-- If you need strict ordering for events belonging to the same entity, how do you achieve that?
-- What's the difference between a Kafka topic and a traditional message queue?
-- What replaced Zookeeper in modern Kafka, and what problem did it solve?
-- What is an offset, and is it deleted once a consumer reads that record?
-- How does the number of partitions in a topic limit consumer parallelism within a group?
+<FundamentalsQuestions/>
 :::

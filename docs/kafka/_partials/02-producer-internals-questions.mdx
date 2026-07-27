@@ -1,0 +1,6 @@
+- Walk through what happens internally between calling `send()` and a record actually reaching the broker.
+- What's the tradeoff of increasing `linger.ms`, and when would you do it?
+- What are the durability differences between `acks=0`, `acks=1`, and `acks=all`?
+- How does the default partitioner decide where a keyed record goes, versus a key-less one?
+- What problem does the idempotent producer solve, and what configuration does it require?
+- Does an idempotent producer give you exactly-once semantics end-to-end? Why or why not?

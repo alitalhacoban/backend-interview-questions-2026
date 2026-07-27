@@ -3,6 +3,8 @@ title: Outbox and Inbox Patterns
 sidebar_label: Outbox & Inbox Pattern
 ---
 
+import OutboxInboxQuestions from './_partials/06-outbox-and-inbox-pattern-questions.mdx';
+
 # Outbox and Inbox Patterns
 
 This is where [Delivery Semantics](./04-delivery-semantics.md) meets real system design. The
@@ -179,10 +181,5 @@ sequenceDiagram
 ```
 
 :::info Interview Questions
-- What is the "dual write problem," and why doesn't wrapping both writes in `@Transactional` solve it?
-- Walk through how the Outbox Pattern guarantees an event is published if and only if the related DB change committed.
-- What's the tradeoff between a polling publisher and CDC (Debezium) for reading the outbox table?
-- Why is the Outbox Pattern alone not enough to prevent duplicate side effects on the consumer side?
-- How does the Inbox Pattern achieve idempotent processing, and what has to be true about the event ID for it to work?
-- How would you achieve effectively-once processing across two services that each own their own database, without distributed transactions?
+<OutboxInboxQuestions/>
 :::

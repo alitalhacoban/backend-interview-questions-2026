@@ -3,6 +3,8 @@ title: Consumers and Consumer Groups
 sidebar_label: Consumers & Groups
 ---
 
+import ConsumerAndGroupsQuestions from './_partials/03-consumer-and-groups-questions.mdx';
+
 # Consumers and Consumer Groups
 
 Rebalancing bugs and offset-management mistakes are two of the most common Kafka production
@@ -138,11 +140,5 @@ a crash or rebalance &mdash; you're tuning the size of the "at-least-once" redel
 eliminating it.
 
 :::info Interview Questions
-- What guarantee does a consumer group provide about which consumer reads a given partition?
-- What happens if you have more consumers in a group than partitions on the topic?
-- What's the difference between eager and cooperative (incremental) rebalancing, and why does it matter operationally?
-- What triggers a consumer rebalance?
-- Why can auto-commit cause message loss, even though Kafka is often described as at-least-once?
-- How does `StickyAssignor` reduce the cost of a rebalance compared to `RangeAssignor`?
-- If you commit offsets before finishing processing versus after, what failure mode does each risk?
+<ConsumerAndGroupsQuestions/>
 :::

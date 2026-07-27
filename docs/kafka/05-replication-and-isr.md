@@ -3,6 +3,8 @@ title: Replication and ISR
 sidebar_label: Replication & ISR
 ---
 
+import ReplicationAndIsrQuestions from './_partials/05-replication-and-isr-questions.mdx';
+
 # Replication and ISR
 
 Replication is how Kafka survives broker failures without losing data, and it's the mechanism
@@ -119,10 +121,5 @@ public NewTopic paymentEventsTopic() {
 ```
 
 :::info Interview Questions
-- What's the difference between replication factor and ISR size?
-- What exactly does `acks=all` wait for, precisely?
-- With RF=3 and `min.insync.replicas=2`, how many broker failures can occur before writes start failing, and why?
-- What happens to a producer's write if the ISR shrinks below `min.insync.replicas`?
-- Why would you avoid enabling `unclean.leader.election.enable` for a financial data topic?
-- How is a new partition leader chosen after the current leader fails, and why doesn't this cause data loss for acknowledged writes?
+<ReplicationAndIsrQuestions/>
 :::
