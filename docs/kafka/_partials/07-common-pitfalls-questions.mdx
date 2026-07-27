@@ -1,7 +1,7 @@
-- What causes a rebalancing storm, and how does `CooperativeStickyAssignor` help?
-- Why does `max.poll.interval.ms` matter even though the consumer's heartbeat thread is still alive?
-- What is a poison pill message, and why can it block an entire partition rather than just one message?
-- How does a Dead Letter Topic prevent a poison pill from stalling a consumer group?
-- What is consumer lag, and what are the main things you'd check first if it started climbing?
-- Why should you generally assume duplicate message processing will happen, rather than try to prevent it entirely?
-- How would you make a consumer's side effect (e.g. charging a customer) idempotent against redelivery?
+- What causes a rebalancing storm, and how does `CooperativeStickyAssignor` help? ([see answer](/docs/question-bank/kafka#rebalancing-storm-cause))
+- Why does `max.poll.interval.ms` matter even though the consumer's heartbeat thread is still alive? ([see answer](/docs/question-bank/kafka#max-poll-interval-ms-matters))
+- What is a poison pill message, and why can it block an entire partition rather than just one message? ([see answer](/docs/question-bank/kafka#poison-pill-message))
+- How does a Dead Letter Topic prevent a poison pill from stalling a consumer group? ([see answer](/docs/question-bank/kafka#dead-letter-topic))
+- What is consumer lag, and what are the main things you'd check first if it started climbing? ([see answer](/docs/question-bank/kafka#consumer-lag))
+- Why should you generally assume duplicate message processing will happen, rather than try to prevent it entirely? ([see answer](/docs/question-bank/kafka#assume-duplicate-processing))
+- How would you make a consumer's side effect (e.g. charging a customer) idempotent against redelivery? ([see answer](/docs/question-bank/kafka#idempotent-side-effect-against-redelivery))

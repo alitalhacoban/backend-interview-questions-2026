@@ -1,6 +1,6 @@
-- What is the "dual write problem," and why doesn't wrapping both writes in `@Transactional` solve it?
-- Walk through how the Outbox Pattern guarantees an event is published if and only if the related DB change committed.
-- What's the tradeoff between a polling publisher and CDC (Debezium) for reading the outbox table?
-- Why is the Outbox Pattern alone not enough to prevent duplicate side effects on the consumer side?
-- How does the Inbox Pattern achieve idempotent processing, and what has to be true about the event ID for it to work?
-- How would you achieve effectively-once processing across two services that each own their own database, without distributed transactions?
+- What is the "dual write problem," and why doesn't wrapping both writes in `@Transactional` solve it? ([see answer](/docs/question-bank/kafka#dual-write-problem))
+- Walk through how the Outbox Pattern guarantees an event is published if and only if the related DB change committed. ([see answer](/docs/question-bank/kafka#outbox-pattern-walkthrough))
+- What's the tradeoff between a polling publisher and CDC (Debezium) for reading the outbox table? ([see answer](/docs/question-bank/kafka#polling-publisher-vs-cdc))
+- Why is the Outbox Pattern alone not enough to prevent duplicate side effects on the consumer side? ([see answer](/docs/question-bank/kafka#outbox-alone-not-enough))
+- How does the Inbox Pattern achieve idempotent processing, and what has to be true about the event ID for it to work? ([see answer](/docs/question-bank/kafka#inbox-pattern-idempotent-processing))
+- How would you achieve effectively-once processing across two services that each own their own database, without distributed transactions? ([see answer](/docs/question-bank/kafka#effectively-once-across-two-services))

@@ -28,3 +28,66 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Question Bank difficulty badges */
+.qb-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.qb-badge--core {
+  background: rgba(46, 133, 85, 0.15);
+  color: var(--ifm-color-primary-darker);
+}
+
+[data-theme='dark'] .qb-badge--core {
+  background: rgba(37, 194, 160, 0.18);
+  color: var(--ifm-color-primary-light);
+}
+
+.qb-badge--edge {
+  background: rgba(230, 126, 34, 0.15);
+  color: #b9650a;
+}
+
+[data-theme='dark'] .qb-badge--edge {
+  background: rgba(230, 126, 34, 0.22);
+  color: #f0a35c;
+}
+
+/* Print view: strip chrome and answers, leave a self-quiz question list */
+@media print {
+  .navbar,
+  .theme-doc-sidebar-container,
+  .theme-doc-toc-desktop,
+  .theme-doc-toc-mobile,
+  .theme-doc-footer,
+  .pagination-nav,
+  [class*='backToTopButton'] {
+    display: none !important;
+  }
+
+  details {
+    page-break-inside: avoid;
+  }
+
+  details > *:not(summary) {
+    display: none !important;
+  }
+
+  details > summary {
+    list-style: disc;
+    margin-left: 1rem;
+  }
+
+  details > summary::before {
+    display: none !important;
+  }
+}

@@ -1,7 +1,7 @@
-- What guarantee does a consumer group provide about which consumer reads a given partition?
-- What happens if you have more consumers in a group than partitions on the topic?
-- What's the difference between eager and cooperative (incremental) rebalancing, and why does it matter operationally?
-- What triggers a consumer rebalance?
-- Why can auto-commit cause message loss, even though Kafka is often described as at-least-once?
-- How does `StickyAssignor` reduce the cost of a rebalance compared to `RangeAssignor`?
-- If you commit offsets before finishing processing versus after, what failure mode does each risk?
+- What guarantee does a consumer group provide about which consumer reads a given partition? ([see answer](/docs/question-bank/kafka#consumer-group-partition-guarantee))
+- What happens if you have more consumers in a group than partitions on the topic? ([see answer](/docs/question-bank/kafka#more-consumers-than-partitions))
+- What's the difference between eager and cooperative (incremental) rebalancing, and why does it matter operationally? ([see answer](/docs/question-bank/kafka#eager-vs-cooperative-rebalancing))
+- What triggers a consumer rebalance? ([see answer](/docs/question-bank/kafka#what-triggers-a-rebalance))
+- Why can auto-commit cause message loss, even though Kafka is often described as at-least-once? ([see answer](/docs/question-bank/kafka#auto-commit-message-loss))
+- How does `StickyAssignor` reduce the cost of a rebalance compared to `RangeAssignor`? ([see answer](/docs/question-bank/kafka#sticky-assignor-vs-range-assignor))
+- If you commit offsets before finishing processing versus after, what failure mode does each risk? ([see answer](/docs/question-bank/kafka#commit-before-vs-after-processing))

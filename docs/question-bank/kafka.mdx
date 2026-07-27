@@ -1,11 +1,12 @@
 ---
-title: Kafka — All Questions
+title: Kafka
 sidebar_label: Kafka
 ---
 
 import ExpandCollapseAll from '@site/src/components/ExpandCollapseAll';
+import Flashcards from '@site/src/components/Flashcards';
 
-# Kafka — All Questions
+# Kafka
 
 Every Kafka interview question on this site, grouped by subtopic — 44 questions across 7 sections.
 Click a question to reveal its answer &mdash; try answering it yourself first, then check. Each
@@ -13,11 +14,12 @@ section ends with a link to the topic's full explanation in `docs/kafka` if you 
 "why," diagrams, or code.
 
 <ExpandCollapseAll />
+<Flashcards />
 
 ## Fundamentals (6 questions)
 
-<details>
-<summary id="unit-of-parallelism-and-ordering">What is the actual unit of parallelism and ordering in Kafka, and why isn't it the topic?</summary>
+<details id="unit-of-parallelism-and-ordering">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the actual unit of parallelism and ordering in Kafka, and why isn't it the topic?</summary>
 
 The partition, not the topic, is Kafka's unit of parallelism and ordering. A topic is just a named
 stream split across partitions, and Kafka only guarantees ordering *within* a single partition —
@@ -25,8 +27,8 @@ never across the whole topic.
 
 </details>
 
-<details>
-<summary id="strict-ordering-for-same-entity">If you need strict ordering for events belonging to the same entity, how do you achieve that?</summary>
+<details id="strict-ordering-for-same-entity">
+<summary><span className="qb-badge qb-badge--core">Core</span>If you need strict ordering for events belonging to the same entity, how do you achieve that?</summary>
 
 Key the record on that entity's ID (e.g. order ID). The default partitioner hashes the key to
 deterministically route every record with that key to the same partition, and ordering is
@@ -34,8 +36,8 @@ guaranteed within a partition.
 
 </details>
 
-<details>
-<summary id="topic-vs-traditional-queue">What's the difference between a Kafka topic and a traditional message queue?</summary>
+<details id="topic-vs-traditional-queue">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a Kafka topic and a traditional message queue?</summary>
 
 A traditional queue (RabbitMQ, ActiveMQ) removes a message once a worker consumes it, and workers
 compete for individual messages. Kafka is an append-only, distributed commit log: messages aren't
@@ -44,8 +46,8 @@ consumer can replay history from the beginning.
 
 </details>
 
-<details>
-<summary id="what-replaced-zookeeper">What replaced Zookeeper in modern Kafka, and what problem did it solve?</summary>
+<details id="what-replaced-zookeeper">
+<summary><span className="qb-badge qb-badge--core">Core</span>What replaced Zookeeper in modern Kafka, and what problem did it solve?</summary>
 
 KRaft (Kafka Raft metadata mode), mandatory since Kafka 4.0. Kafka now manages its own cluster
 metadata and controller election internally via Raft consensus among a subset of brokers, removing
@@ -54,8 +56,8 @@ bottleneck at high partition counts.
 
 </details>
 
-<details>
-<summary id="what-is-an-offset">What is an offset, and is it deleted once a consumer reads that record?</summary>
+<details id="what-is-an-offset">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is an offset, and is it deleted once a consumer reads that record?</summary>
 
 An offset is a monotonically increasing index of a record's position within its partition. Reading
 a record does not delete it — retention (time- or size-based) controls when data is removed,
@@ -63,8 +65,8 @@ completely independent of whether any consumer has read it.
 
 </details>
 
-<details>
-<summary id="partitions-limit-consumer-parallelism">How does the number of partitions in a topic limit consumer parallelism within a group?</summary>
+<details id="partitions-limit-consumer-parallelism">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does the number of partitions in a topic limit consumer parallelism within a group?</summary>
 
 A partition can only be actively read by one consumer per group at a time, so the partition count
 is a hard ceiling on how many consumers in a single group can do useful work in parallel — extra
@@ -76,8 +78,8 @@ Full explanation → [Kafka Fundamentals](../kafka/01-fundamentals.md)
 
 ## Producer Internals (6 questions)
 
-<details>
-<summary id="send-to-broker-walkthrough">Walk through what happens between calling send() and a record actually reaching the broker.</summary>
+<details id="send-to-broker-walkthrough">
+<summary><span className="qb-badge qb-badge--core">Core</span>Walk through what happens between calling send() and a record actually reaching the broker.</summary>
 
 The record is serialized, routed to a partition by the partitioner, appended to an in-memory
 per-partition batch in the `RecordAccumulator`, and a background sender thread drains ready batches
@@ -86,8 +88,8 @@ completes once the broker acknowledges per the `acks` setting.
 
 </details>
 
-<details>
-<summary id="linger-ms-tradeoff">What's the tradeoff of increasing linger.ms, and when would you do it?</summary>
+<details id="linger-ms-tradeoff">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the tradeoff of increasing linger.ms, and when would you do it?</summary>
 
 It trades a small amount of added latency for larger, more efficient batches — higher throughput
 and better compression, fewer network round-trips. Raise it for high-throughput pipelines where a
@@ -95,8 +97,8 @@ few extra milliseconds per batch don't matter; keep it low for latency-sensitive
 
 </details>
 
-<details>
-<summary id="acks-0-1-all-durability">What are the durability differences between acks=0, acks=1, and acks=all?</summary>
+<details id="acks-0-1-all-durability">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the durability differences between acks=0, acks=1, and acks=all?</summary>
 
 `acks=0` doesn't wait for any broker response (fastest, records can be silently lost); `acks=1`
 waits only for the partition leader to persist the record (lost if the leader crashes before
@@ -105,8 +107,8 @@ durability at the cost of latency.
 
 </details>
 
-<details>
-<summary id="default-partitioner-keyed-vs-keyless">How does the default partitioner decide where a keyed record goes, versus a key-less one?</summary>
+<details id="default-partitioner-keyed-vs-keyless">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does the default partitioner decide where a keyed record goes, versus a key-less one?</summary>
 
 A keyed record is hashed (murmur2) to consistently map it to the same partition every time. A
 key-less record is assigned to a "sticky" partition that batches multiple key-less records together
@@ -115,8 +117,8 @@ naive round-robin.
 
 </details>
 
-<details>
-<summary id="idempotent-producer-problem-and-config">What problem does the idempotent producer solve, and what configuration does it require?</summary>
+<details id="idempotent-producer-problem-and-config">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the idempotent producer solve, and what configuration does it require?</summary>
 
 Producer retries (e.g. after a lost ack for a write the broker actually received) can create
 duplicate writes. `enable.idempotence=true` assigns each producer session a PID and a per-partition
@@ -125,8 +127,8 @@ sequence number so the broker rejects a retried write it's already seen. It requ
 
 </details>
 
-<details>
-<summary id="idempotent-producer-exactly-once">Does an idempotent producer give you exactly-once semantics end-to-end? Why or why not?</summary>
+<details id="idempotent-producer-exactly-once">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Does an idempotent producer give you exactly-once semantics end-to-end? Why or why not?</summary>
 
 No — it only guarantees exactly-once delivery within a single producer session, per partition.
 End-to-end exactly-once across a consume-transform-produce pipeline requires Kafka transactions
@@ -138,24 +140,24 @@ Full explanation → [Producer Internals](../kafka/02-producer-internals.md)
 
 ## Consumers and Consumer Groups (7 questions)
 
-<details>
-<summary id="consumer-group-partition-guarantee">What guarantee does a consumer group provide about which consumer reads a given partition?</summary>
+<details id="consumer-group-partition-guarantee">
+<summary><span className="qb-badge qb-badge--core">Core</span>What guarantee does a consumer group provide about which consumer reads a given partition?</summary>
 
 Kafka guarantees a given partition is consumed by at most one consumer within a group at a time —
 this is what makes consumer groups the mechanism for horizontally scaling consumption.
 
 </details>
 
-<details>
-<summary id="more-consumers-than-partitions">What happens if you have more consumers in a group than partitions on the topic?</summary>
+<details id="more-consumers-than-partitions">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What happens if you have more consumers in a group than partitions on the topic?</summary>
 
 The extra consumers are assigned no partitions and sit idle — partition count is a hard ceiling on
 effective parallelism within a single consumer group.
 
 </details>
 
-<details>
-<summary id="eager-vs-cooperative-rebalancing">What's the difference between eager and cooperative (incremental) rebalancing?</summary>
+<details id="eager-vs-cooperative-rebalancing">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between eager and cooperative (incremental) rebalancing?</summary>
 
 Eager rebalancing revokes every consumer's partitions and reassigns from scratch, pausing the
 *entire* group on every membership change. Cooperative rebalancing (`CooperativeStickyAssignor`)
@@ -163,8 +165,8 @@ only moves the specific partitions that need to move, so unaffected consumers ke
 
 </details>
 
-<details>
-<summary id="what-triggers-a-rebalance">What triggers a consumer rebalance?</summary>
+<details id="what-triggers-a-rebalance">
+<summary><span className="qb-badge qb-badge--core">Core</span>What triggers a consumer rebalance?</summary>
 
 A consumer joining or leaving the group (including crash detection via missed heartbeats), a
 consumer failing to call `poll()` within `max.poll.interval.ms`, or topic metadata changes such as
@@ -172,8 +174,8 @@ a partition count increase.
 
 </details>
 
-<details>
-<summary id="auto-commit-message-loss">Why can auto-commit cause message loss, even though Kafka is often described as at-least-once?</summary>
+<details id="auto-commit-message-loss">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why can auto-commit cause message loss, even though Kafka is often described as at-least-once?</summary>
 
 Auto-commit advances offsets on a timer based on what `poll()` returned, not on whether your
 handler actually finished processing those records. If the consumer crashes after an auto-commit
@@ -181,8 +183,8 @@ fires but before it finishes handling those records, they're silently skipped on
 
 </details>
 
-<details>
-<summary id="sticky-assignor-vs-range-assignor">How does StickyAssignor reduce the cost of a rebalance compared to RangeAssignor?</summary>
+<details id="sticky-assignor-vs-range-assignor">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does StickyAssignor reduce the cost of a rebalance compared to RangeAssignor?</summary>
 
 `StickyAssignor` keeps as much of a consumer's previous assignment as possible across a rebalance,
 minimizing partition movement — this matters for stateful consumers, since less movement means less
@@ -190,8 +192,8 @@ state to rebuild. `RangeAssignor` reassigns contiguous ranges with no such prese
 
 </details>
 
-<details>
-<summary id="commit-before-vs-after-processing">If you commit offsets before finishing processing versus after, what failure mode does each risk?</summary>
+<details id="commit-before-vs-after-processing">
+<summary><span className="qb-badge qb-badge--core">Core</span>If you commit offsets before finishing processing versus after, what failure mode does each risk?</summary>
 
 Committing before processing risks message loss if the consumer crashes mid-processing (at-most-once).
 Committing after processing risks duplicate reprocessing if the consumer crashes after finishing
@@ -203,16 +205,16 @@ Full explanation → [Consumers and Consumer Groups](../kafka/03-consumer-and-gr
 
 ## Delivery Semantics (6 questions)
 
-<details>
-<summary id="at-most-once-data-loss-scenario">Describe a concrete scenario where at-most-once delivery results in data loss.</summary>
+<details id="at-most-once-data-loss-scenario">
+<summary><span className="qb-badge qb-badge--core">Core</span>Describe a concrete scenario where at-most-once delivery results in data loss.</summary>
 
 The consumer commits offsets immediately after `poll()`, before processing, then crashes mid-batch.
 On restart it resumes past the uncommitted-but-unprocessed record, so it's silently skipped.
 
 </details>
 
-<details>
-<summary id="at-least-once-duplicate-scenario">Describe a concrete scenario where at-least-once delivery results in duplicate processing.</summary>
+<details id="at-least-once-duplicate-scenario">
+<summary><span className="qb-badge qb-badge--core">Core</span>Describe a concrete scenario where at-least-once delivery results in duplicate processing.</summary>
 
 The consumer finishes processing a record (e.g. charges a customer) but crashes before committing
 the offset. On restart it resumes from the last committed offset and reprocesses the same record,
@@ -220,8 +222,8 @@ producing a duplicate side effect.
 
 </details>
 
-<details>
-<summary id="exactly-once-consume-transform-produce">How does Kafka implement exactly-once semantics for a consume-transform-produce pipeline?</summary>
+<details id="exactly-once-consume-transform-produce">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does Kafka implement exactly-once semantics for a consume-transform-produce pipeline?</summary>
 
 A transactional producer wraps producing the output record and committing the input consumer
 offset in a single Kafka transaction (`sendOffsetsToTransaction` + `commitTransaction`), so both
@@ -230,8 +232,8 @@ fully-committed transactions.
 
 </details>
 
-<details>
-<summary id="exactly-once-limited-to-within-kafka">Why is Kafka's exactly-once guarantee limited to "within Kafka," and what breaks it?</summary>
+<details id="exactly-once-limited-to-within-kafka">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is Kafka's exactly-once guarantee limited to "within Kafka," and what breaks it?</summary>
 
 Kafka transactions only make Kafka-internal writes (produced records + committed offsets) atomic.
 The moment a pipeline writes to an external system — a database, an HTTP call — that write falls
@@ -239,8 +241,8 @@ outside the transaction, breaking the end-to-end guarantee.
 
 </details>
 
-<details>
-<summary id="isolation-level-read-committed">What does isolation.level=read_committed actually change about what a consumer sees?</summary>
+<details id="isolation-level-read-committed">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What does isolation.level=read_committed actually change about what a consumer sees?</summary>
 
 It hides records from aborted or still-open transactions — the consumer only sees records from
 transactions that have actually committed, instead of seeing every write as soon as it's appended
@@ -248,8 +250,8 @@ to the log.
 
 </details>
 
-<details>
-<summary id="effectively-once-external-database">If your pipeline writes to an external database as its final step, how would you achieve effectively-once behavior?</summary>
+<details id="effectively-once-external-database">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>If your pipeline writes to an external database as its final step, how would you achieve effectively-once behavior?</summary>
 
 Kafka transactions can't cover the external write. Use the transactional outbox/inbox pattern, or
 make the external write idempotent (e.g. an upsert keyed on a unique business ID, or an
@@ -261,8 +263,8 @@ Full explanation → [Delivery Semantics](../kafka/04-delivery-semantics.md)
 
 ## Replication and ISR (6 questions)
 
-<details>
-<summary id="replication-factor-vs-isr-size">What's the difference between replication factor and ISR size?</summary>
+<details id="replication-factor-vs-isr-size">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between replication factor and ISR size?</summary>
 
 Replication factor is the total number of configured copies of a partition. ISR (in-sync replicas)
 is the subset of those replicas currently caught up with the leader — ISR size can be smaller than
@@ -270,8 +272,8 @@ RF if a follower has fallen behind.
 
 </details>
 
-<details>
-<summary id="what-acks-all-waits-for">What exactly does acks=all wait for, precisely?</summary>
+<details id="what-acks-all-waits-for">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What exactly does acks=all wait for, precisely?</summary>
 
 All replicas currently in the ISR — not every replica that nominally exists for the partition. If a
 follower has fallen out of the ISR, `acks=all` only needs acknowledgment from the remaining ISR
@@ -279,8 +281,8 @@ members.
 
 </details>
 
-<details>
-<summary id="rf-3-min-insync-replicas-2-failures">With RF=3 and min.insync.replicas=2, how many broker failures can occur before writes start failing, and why?</summary>
+<details id="rf-3-min-insync-replicas-2-failures">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>With RF=3 and min.insync.replicas=2, how many broker failures can occur before writes start failing, and why?</summary>
 
 One. Losing a single broker still leaves 2 replicas in the ISR, satisfying
 `min.insync.replicas=2`. A second simultaneous failure drops the ISR to 1, and the producer gets a
@@ -289,16 +291,16 @@ compromised.
 
 </details>
 
-<details>
-<summary id="isr-shrinks-below-min-insync-replicas">What happens to a producer's write if the ISR shrinks below min.insync.replicas?</summary>
+<details id="isr-shrinks-below-min-insync-replicas">
+<summary><span className="qb-badge qb-badge--core">Core</span>What happens to a producer's write if the ISR shrinks below min.insync.replicas?</summary>
 
 The write is rejected with a `NotEnoughReplicasException`. Kafka refuses to accept a write it can't
 durably replicate rather than silently accepting one that only exists on too few brokers.
 
 </details>
 
-<details>
-<summary id="unclean-leader-election-financial-data">Why would you avoid enabling unclean.leader.election.enable for a financial data topic?</summary>
+<details id="unclean-leader-election-financial-data">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why would you avoid enabling unclean.leader.election.enable for a financial data topic?</summary>
 
 It allows an out-of-sync replica to be elected leader when no in-sync replica is available, trading
 availability for durability — some already-acknowledged records may not exist on that replica and
@@ -306,8 +308,8 @@ are lost. For financial data, unavailability is preferable to silent data loss.
 
 </details>
 
-<details>
-<summary id="new-leader-election-after-failure">How is a new partition leader chosen after the current leader fails, and why doesn't this cause data loss for acknowledged writes?</summary>
+<details id="new-leader-election-after-failure">
+<summary><span className="qb-badge qb-badge--core">Core</span>How is a new partition leader chosen after the current leader fails, and why doesn't this cause data loss for acknowledged writes?</summary>
 
 The controller elects a new leader from the replicas that were in the ISR at the time of failure.
 Because ISR membership requires being caught up, the new leader is guaranteed to have every record
@@ -319,8 +321,8 @@ Full explanation → [Replication and ISR](../kafka/05-replication-and-isr.md)
 
 ## Outbox and Inbox Patterns (6 questions)
 
-<details>
-<summary id="dual-write-problem">What is the "dual write problem," and why doesn't wrapping both writes in @Transactional solve it?</summary>
+<details id="dual-write-problem">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the "dual write problem," and why doesn't wrapping both writes in @Transactional solve it?</summary>
 
 Writing to a database and publishing a Kafka event are two independent systems with no shared
 transaction. `@Transactional` only covers the database write — the DB commit can succeed while the
@@ -328,8 +330,8 @@ Kafka send fails (or crashes before it), or vice versa, leaving the two systems 
 
 </details>
 
-<details>
-<summary id="outbox-pattern-walkthrough">Walk through how the Outbox Pattern guarantees an event is published if and only if the related DB change committed.</summary>
+<details id="outbox-pattern-walkthrough">
+<summary><span className="qb-badge qb-badge--core">Core</span>Walk through how the Outbox Pattern guarantees an event is published if and only if the related DB change committed.</summary>
 
 Instead of publishing to Kafka directly, the event is written to an outbox table in the *same*
 database transaction as the business data. Since both inserts commit or roll back together, there
@@ -337,8 +339,8 @@ is no window where the business change exists without its corresponding outbox r
 
 </details>
 
-<details>
-<summary id="polling-publisher-vs-cdc">What's the tradeoff between a polling publisher and CDC (Debezium) for reading the outbox table?</summary>
+<details id="polling-publisher-vs-cdc">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the tradeoff between a polling publisher and CDC (Debezium) for reading the outbox table?</summary>
 
 A polling publisher is simple to implement but adds polling latency and database load, and needs
 care around concurrent pollers double-publishing. CDC (Debezium) tails the database's WAL/binlog
@@ -347,8 +349,8 @@ of an extra moving piece of infrastructure (Kafka Connect).
 
 </details>
 
-<details>
-<summary id="outbox-alone-not-enough">Why is the Outbox Pattern alone not enough to prevent duplicate side effects on the consumer side?</summary>
+<details id="outbox-alone-not-enough">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is the Outbox Pattern alone not enough to prevent duplicate side effects on the consumer side?</summary>
 
 The publishing step and the Kafka consumer are still at-least-once — a record can be redelivered.
 The Outbox Pattern guarantees the event *is* published, not that it's processed exactly once by
@@ -356,8 +358,8 @@ whoever consumes it.
 
 </details>
 
-<details>
-<summary id="inbox-pattern-idempotent-processing">How does the Inbox Pattern achieve idempotent processing, and what has to be true about the event ID for it to work?</summary>
+<details id="inbox-pattern-idempotent-processing">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does the Inbox Pattern achieve idempotent processing, and what has to be true about the event ID for it to work?</summary>
 
 The consumer checks a table of already-processed event IDs in the same transaction as its business
 side effect, skipping the side effect if the ID is already present. This only works if the event ID
@@ -365,8 +367,8 @@ is stable and unique — generated once, at the outbox-write step, and carried t
 
 </details>
 
-<details>
-<summary id="effectively-once-across-two-services">How would you achieve effectively-once processing across two services that each own their own database, without distributed transactions?</summary>
+<details id="effectively-once-across-two-services">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How would you achieve effectively-once processing across two services that each own their own database, without distributed transactions?</summary>
 
 Combine both patterns: an outbox on the producing side (atomic with its DB write) and an inbox on
 the consuming side (atomic with its DB write and idempotency check). Neither side needs a
@@ -378,8 +380,8 @@ Full explanation → [Outbox and Inbox Patterns](../kafka/06-outbox-and-inbox-pa
 
 ## Common Pitfalls (7 questions)
 
-<details>
-<summary id="rebalancing-storm-cause">What causes a rebalancing storm, and how does CooperativeStickyAssignor help?</summary>
+<details id="rebalancing-storm-cause">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What causes a rebalancing storm, and how does CooperativeStickyAssignor help?</summary>
 
 Consumers get evicted (often because processing exceeded `max.poll.interval.ms`) and immediately
 try to rejoin, triggering another rebalance, with little actual processing happening in between.
@@ -388,8 +390,8 @@ move, so churn doesn't pause the whole group.
 
 </details>
 
-<details>
-<summary id="max-poll-interval-ms-matters">Why does max.poll.interval.ms matter even though the consumer's heartbeat thread is still alive?</summary>
+<details id="max-poll-interval-ms-matters">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does max.poll.interval.ms matter even though the consumer's heartbeat thread is still alive?</summary>
 
 Heartbeats run on a separate thread from the poll loop. If your listener method takes too long, the
 consumer is still considered dead once `max.poll.interval.ms` elapses, even though heartbeats kept
@@ -397,8 +399,8 @@ arriving — it gets evicted and must rejoin.
 
 </details>
 
-<details>
-<summary id="poison-pill-message">What is a poison pill message, and why can it block an entire partition rather than just one message?</summary>
+<details id="poison-pill-message">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a poison pill message, and why can it block an entire partition rather than just one message?</summary>
 
 A message that fails processing every time it's retried (e.g. a deserialization error). With naive
 retry-on-failure logic the offset never advances, so the consumer loops on the same message
@@ -407,8 +409,8 @@ too.
 
 </details>
 
-<details>
-<summary id="dead-letter-topic">How does a Dead Letter Topic prevent a poison pill from stalling a consumer group?</summary>
+<details id="dead-letter-topic">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does a Dead Letter Topic prevent a poison pill from stalling a consumer group?</summary>
 
 After a bounded number of retries, the failing record (plus failure metadata) is published to a
 separate DLT and the original offset is committed, letting the partition keep moving instead of
@@ -416,8 +418,8 @@ looping indefinitely.
 
 </details>
 
-<details>
-<summary id="consumer-lag">What is consumer lag, and what are the main things you'd check first if it started climbing?</summary>
+<details id="consumer-lag">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is consumer lag, and what are the main things you'd check first if it started climbing?</summary>
 
 The gap between the latest produced offset and the last committed offset for a group — how far
 behind the consumer is. Check, in order: partition count vs. consumer count, per-record processing
@@ -425,8 +427,8 @@ time, and rebalance frequency.
 
 </details>
 
-<details>
-<summary id="assume-duplicate-processing">Why should you generally assume duplicate message processing will happen, rather than try to prevent it entirely?</summary>
+<details id="assume-duplicate-processing">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why should you generally assume duplicate message processing will happen, rather than try to prevent it entirely?</summary>
 
 At-least-once delivery — Kafka's common, safe default — means duplicates are an expected, ordinary
 occurrence from producer retries, consumer redelivery after a crash, or rebalances, not an edge
@@ -434,8 +436,8 @@ case worth fighting at the source.
 
 </details>
 
-<details>
-<summary id="idempotent-side-effect-against-redelivery">How would you make a consumer's side effect (e.g. charging a customer) idempotent against redelivery?</summary>
+<details id="idempotent-side-effect-against-redelivery">
+<summary><span className="qb-badge qb-badge--core">Core</span>How would you make a consumer's side effect (e.g. charging a customer) idempotent against redelivery?</summary>
 
 Use the Inbox Pattern with a durable event ID, a natural idempotency key (e.g. an upsert keyed on a
 unique business ID), or an `Idempotency-Key` header the downstream API supports.
