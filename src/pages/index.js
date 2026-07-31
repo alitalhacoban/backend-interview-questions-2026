@@ -83,6 +83,22 @@ export default function Home() {
                     and proxies, Spring Security, testing, and
                     configuration/profiles/Actuator.
                   </li>
+                  <li>
+                    <Link to="/docs/dbms/dbms-fundamentals">DBMS</Link>{' '}
+                    &mdash; relational theory, keys and SQL, normalization,
+                    indexing, transactions and ACID, concurrency control and
+                    isolation levels, query optimization, storage and
+                    recovery, and replication/sharding/NoSQL.
+                  </li>
+                  <li>
+                    <Link to="/docs/design-patterns/design-patterns-fundamentals">
+                      Design Patterns
+                    </Link>{' '}
+                    &mdash; GoF creational, structural, and behavioral
+                    patterns, Singleton and thread safety, dependency
+                    injection and enterprise patterns, concurrency patterns,
+                    and anti-patterns/pattern selection.
+                  </li>
                 </ul>
                 <p>
                   More topics (PostgreSQL, Redis, distributed systems, API

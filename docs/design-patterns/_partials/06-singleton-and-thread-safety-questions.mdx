@@ -1,0 +1,8 @@
+- What's wrong with a naive lazily-initialized Singleton under multi-threaded access? ([see answer](/docs/question-bank/design-patterns#naive-singleton-race-condition))
+- What's the tradeoff between eager initialization and a `synchronized getInstance()` for Singleton? ([see answer](/docs/question-bank/design-patterns#eager-vs-synchronized-singleton))
+- How does double-checked locking make Singleton thread-safe without paying a lock on every call, and why is `volatile` required? ([see answer](/docs/question-bank/design-patterns#double-checked-locking-and-volatile))
+- What is the initialization-on-demand holder idiom, and why is it thread-safe without any explicit locking? ([see answer](/docs/question-bank/design-patterns#holder-idiom))
+- Why is enum singleton considered the safest Singleton implementation in Java? ([see answer](/docs/question-bank/design-patterns#enum-singleton))
+- How can reflection break a standard Singleton, and why doesn't that work against an enum singleton? ([see answer](/docs/question-bank/design-patterns#reflection-attack-on-singleton))
+- How can Java serialization silently create a second Singleton instance, and how do you prevent it? ([see answer](/docs/question-bank/design-patterns#serialization-attack-on-singleton))
+- Spring beans are singletons by default — why doesn't application code need any of the GoF Singleton boilerplate? ([see answer](/docs/question-bank/design-patterns#spring-singleton-scope))

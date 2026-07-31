@@ -1,0 +1,688 @@
+---
+title: Design Patterns
+sidebar_label: Design Patterns
+---
+
+import ExpandCollapseAll from '@site/src/components/ExpandCollapseAll';
+import Flashcards from '@site/src/components/Flashcards';
+
+# Design Patterns
+
+Every Design Patterns question on this site, grouped by subtopic — 64 questions across 9 sections.
+Click a question to reveal its answer &mdash; try answering it yourself first, then check. Each
+section ends with a link to the topic's full explanation in `docs/design-patterns` if you need the
+deeper "why," diagrams, or code.
+
+<ExpandCollapseAll />
+<Flashcards />
+
+## Design Patterns Fundamentals (7 questions)
+
+<details id="what-is-a-design-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a design pattern, and why isn't it just reusable code you copy-paste?</summary>
+
+A named, reusable *solution template* to a recurring object-oriented design problem, not an
+artifact you import. Unlike a library, it has no code you call directly — you re-implement its
+shape yourself, adapted to your own types. The name itself communicates the whole approach (e.g.
+"Decorator") to anyone who already knows the pattern.
+
+</details>
+
+<details id="gof-three-categories">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the three GoF pattern categories, and what question does each one answer?</summary>
+
+Creational (how are objects created — Singleton, Factory Method, Abstract Factory, Builder,
+Prototype), Structural (how are classes/objects composed into larger structures — Adapter,
+Decorator, Facade, Proxy, Composite, Bridge, Flyweight), and Behavioral (how do objects
+communicate and share responsibility — Strategy, Observer, Command, Template Method, Iterator,
+State, Chain of Responsibility, Mediator, Memento, Visitor).
+
+</details>
+
+<details id="pattern-vs-anti-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a design pattern and an anti-pattern?</summary>
+
+A design pattern is a proven solution. An anti-pattern is a commonly-repeated shape that looks
+reasonable but reliably causes problems — e.g. God Object, Singleton abuse, Golden Hammer. It's
+not "the opposite" of a pattern, it's a recognizable recurring shape that experience shows is bad.
+
+</details>
+
+<details id="pattern-vs-idiom-vs-architectural-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a design pattern, an idiom, and an architectural pattern?</summary>
+
+An idiom is a low-level, language-specific convention (try-with-resources), not portable across
+languages. A design pattern is a mid-level, language-agnostic class/object-design solution
+(Singleton, Observer). An architectural pattern is a high-level solution for structuring an entire
+application (MVC, layered architecture, microservices) — broader in scope, usually built from
+several design patterns together.
+
+</details>
+
+<details id="patterns-and-solid">
+<summary><span className="qb-badge qb-badge--core">Core</span>How do design patterns relate to the SOLID principles?</summary>
+
+Patterns are applied SOLID principles made concrete. Strategy/Template Method express the
+Open/Closed Principle; Dependency Injection is Dependency Inversion made concrete; Decorator/Adapter
+lean on Liskov Substitution. Recognizing the connection shows understanding of *why* a pattern
+exists, not just its class diagram.
+
+</details>
+
+<details id="patterns-outside-gof">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why do concurrency and enterprise patterns exist outside the original 23 GoF patterns?</summary>
+
+The 1994 GoF book predates threads-as-a-first-class concern and today's layered enterprise
+architecture. Concurrency patterns (Producer-Consumer, Thread Pool) address coordinating work
+across threads; enterprise patterns (Repository, DAO, DTO, DI) address structuring an application's
+layers — both are essential in backend work despite falling outside the original catalog.
+
+</details>
+
+<details id="reading-uml-pattern-diagrams">
+<summary><span className="qb-badge qb-badge--core">Core</span>In a UML class diagram, what's the difference between association, aggregation, and composition?</summary>
+
+Association (plain arrow): one class references another, each can outlive the other. Aggregation
+(hollow diamond): "has-a, weak ownership" — the contained object can exist independently (a Team
+has Players who can exist without the team). Composition (filled diamond): "has-a, strong
+ownership" — the contained object's lifecycle is bound to the container's (a House's Rooms don't
+outlive it).
+
+</details>
+
+Full explanation → [Design Patterns Fundamentals](../design-patterns/01-design-patterns-fundamentals.md)
+
+## Creational Patterns (8 questions)
+
+<details id="factory-method">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Factory Method pattern solve, and what does a minimal implementation look like?</summary>
+
+Lets a subclass decide which concrete class to instantiate, instead of hard-coding `new` in the
+caller. A base class defines an abstract "factory method"; each subclass overrides it to return a
+different concrete product, while calling code only depends on the abstract type. JDK example:
+`Calendar.getInstance()`.
+
+</details>
+
+<details id="factory-method-vs-abstract-factory">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between Factory Method and Abstract Factory?</summary>
+
+Factory Method creates *one* product via subclassing and overriding a single method. Abstract
+Factory creates a *whole family* of related products via composition — the caller is handed a
+factory object (not a subclass) that produces every product in a consistent family (e.g. all
+widgets for one UI theme). Abstract Factories are often built out of several Factory Methods.
+
+</details>
+
+<details id="builder-vs-telescoping-constructors">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Builder pattern solve, and how does it beat telescoping constructors?</summary>
+
+Solves the problem of an object with many optional parameters, which otherwise forces "telescoping"
+constructor overloads that are unreadable and error-prone (easy to swap same-typed args). A builder
+object accumulates parameters via chained calls, then constructs the final (often immutable) object
+in one `build()` call, which can also validate the fully-assembled state in one place.
+
+</details>
+
+<details id="prototype-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Prototype pattern, and when would cloning an existing object beat calling `new`?</summary>
+
+Objects implement `clone()`, and new instances are produced by copying an existing "prototype"
+rather than re-running full initialization. Useful when construction is expensive (heavy setup, DB
+round-trips) or when you need a copy of an object whose exact runtime class isn't known at compile
+time.
+
+</details>
+
+<details id="shallow-vs-deep-copy">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>In Java's `Object.clone()`, what's the difference between a shallow copy and a deep copy, and why does it matter?</summary>
+
+`Object.clone()` does a shallow copy by default: primitives/immutables copy correctly, but
+reference fields (e.g. a `List`) end up shared between original and clone. A correct `clone()` for
+a class with mutable reference fields must explicitly deep-copy those fields itself, or mutating
+one instance's list will silently affect the "independent" clone too.
+
+</details>
+
+<details id="singleton-brief">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Singleton pattern solve, at a high level?</summary>
+
+Ensures exactly one instance of a class exists application-wide and is globally accessible (e.g. a
+config manager or connection pool), via a private constructor plus a static accessor. The real
+complexity is making that safe under concurrency and resistant to reflection/serialization — see
+the dedicated Singleton & Thread Safety section.
+
+</details>
+
+<details id="builder-vs-factory-method">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Builder vs. Factory Method — how do you decide which one fits a given object-creation problem?</summary>
+
+Factory Method fits when the *decision* is which concrete type to create (one call, one product,
+type chosen by context/subclass). Builder fits when the problem is *assembling* one complex object
+step-by-step from many optional parts, regardless of which single concrete type is being built.
+
+</details>
+
+<details id="creational-patterns-in-the-jdk">
+<summary><span className="qb-badge qb-badge--core">Core</span>Can you name a place the JDK itself already uses a creational pattern?</summary>
+
+`Calendar.getInstance()`/`NumberFormat.getInstance()` (Factory Method), `Executors.newFixedThreadPool(...)`
+(Factory Method returning an `ExecutorService`), `StringBuilder` (Builder-like accumulate-then-produce
+shape), and `Object.clone()`/`Cloneable` (Prototype built into the language).
+
+</details>
+
+Full explanation → [Creational Patterns](../design-patterns/02-creational-patterns.md)
+
+## Structural Patterns (9 questions)
+
+<details id="adapter-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Adapter pattern solve, and what's a JDK example of one?</summary>
+
+Translates between two existing, incompatible interfaces you can't change — a wrapper class
+implements the interface your code expects and forwards calls to the wrapped class's actual
+methods. JDK examples: `Arrays.asList()` and `InputStreamReader` (adapting a byte stream to a
+character stream).
+
+</details>
+
+<details id="decorator-vs-inheritance">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Decorator pattern solve, and how is it different from just using inheritance?</summary>
+
+Adds responsibilities to one specific object dynamically, avoiding a combinatorial explosion of
+subclasses for every combination of behaviors (e.g. `BufferedInputStream` wrapping
+`GZIPInputStream` wrapping `FileInputStream`). Inheritance adds behavior statically, at compile
+time, to every instance of a class; Decorator adds it at runtime, to one instance, and lets
+independent behaviors be freely combined.
+
+</details>
+
+<details id="facade-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Facade pattern solve?</summary>
+
+A subsystem has many interacting classes with a complex combined interface, but most callers only
+need a small slice of it. A Facade provides one simplified interface that internally coordinates
+the subsystem, hiding its complexity from callers who don't need it.
+
+</details>
+
+<details id="adapter-vs-facade">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between the Adapter and Facade patterns?</summary>
+
+Adapter makes one existing interface look like another interface the caller expects — translation,
+same level of complexity. Facade makes a complex *set* of interfaces simpler to use —
+simplification, not necessarily translating anything (the underlying interfaces are usually fine,
+just numerous).
+
+</details>
+
+<details id="proxy-pattern-flavors">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Proxy pattern, and what are the three common flavors (virtual, protection, remote)?</summary>
+
+A proxy implements the same interface as a real object and forwards calls to it, adding logic
+around the forwarding, to control access. Virtual proxy defers expensive object creation (lazy
+loading); protection proxy checks permissions before forwarding; remote proxy represents an object
+in a different process/address space (RPC/RMI/gRPC client stubs).
+
+</details>
+
+<details id="proxy-vs-decorator">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between Proxy and Decorator, given they look almost identical on a class diagram?</summary>
+
+Both wrap an object behind the same interface, but the *intent* differs: Decorator's job is adding
+behavior and is meant to be stacked arbitrarily by a client that's aware it's decorating. Proxy's
+job is controlling access and is meant to be transparent — the client typically doesn't know it's
+talking to a proxy instead of the real object.
+
+</details>
+
+<details id="composite-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Composite pattern solve, and what's a concrete example?</summary>
+
+Lets client code treat individual objects and groups of objects uniformly, via a common interface
+implemented by both leaf and container nodes, where containers delegate to and aggregate results
+from their children (a recursive tree). Example: a filesystem where `File` and `Directory` both
+respond to `getSize()`.
+
+</details>
+
+<details id="bridge-vs-strategy">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What problem does the Bridge pattern solve, and how is it different from Strategy?</summary>
+
+Bridge splits an abstraction and its implementation into two separate hierarchies connected by
+composition, so both can vary independently without a class per combination. It looks like
+Strategy on a diagram, but Bridge is a structural design-time decision to let two hierarchies vary
+independently; Strategy is a behavioral decision to let one algorithm be swapped at runtime for a
+specific operation.
+
+</details>
+
+<details id="flyweight-pattern">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What problem does the Flyweight pattern solve, and what's the difference between intrinsic and extrinsic state?</summary>
+
+Solves memory exhaustion from huge numbers of similar objects (e.g. millions of rendered trees) by
+splitting state into intrinsic (shared, immutable, stored once in a shared flyweight — e.g. a
+tree's mesh/texture) and extrinsic (unique per instance, passed in by the client at call time —
+e.g. x/y position), instead of storing full state per object.
+
+</details>
+
+Full explanation → [Structural Patterns](../design-patterns/03-structural-patterns.md)
+
+## Behavioral Patterns I (7 questions)
+
+<details id="strategy-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Strategy pattern solve, and what's a JDK example of one?</summary>
+
+Lets an algorithm vary independently of the class using it, without `if/else` chains or a subclass
+per variant. Each variant is extracted into its own class implementing a common interface; the
+context holds and delegates to a swappable strategy object at runtime. JDK example: `Comparator`
+passed into `Collections.sort`.
+
+</details>
+
+<details id="observer-push-vs-pull">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Observer pattern solve, and what's the difference between its push and pull variants?</summary>
+
+Lets an open-ended set of objects be notified when another object's state changes, without that
+object being coupled to its observers' concrete classes. Push sends full event data to `update()`
+(less coupling work for the observer, more bandwidth); pull sends a minimal notification and lets
+the observer query for details it needs (looser coupling, extra round-trip).
+
+</details>
+
+<details id="command-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Command pattern solve, and how does it enable undo/redo?</summary>
+
+Encapsulates a request (action + parameters) as a first-class object with an `execute()` method, so
+it can be queued, logged, or passed around without the invoker knowing what it does. Undo/redo
+works by having each command also implement `undo()`, with executed commands pushed onto a history
+stack.
+
+</details>
+
+<details id="template-method-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Template Method pattern solve?</summary>
+
+Several classes share the same overall algorithm structure but differ in one or two steps. A base
+class defines the fixed skeleton (marked `final`), calling out to abstract/overridable hook methods
+that subclasses fill in for the parts that vary.
+
+</details>
+
+<details id="template-method-vs-strategy">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between Template Method and Strategy, given both let one step of a process vary?</summary>
+
+Template Method uses inheritance — the varying step is a method a subclass overrides, with the
+overall flow living in the base class. Strategy uses composition — the varying step is a separate
+injected object, no inheritance relationship. Strategy is generally preferred where it fits, since
+it allows swapping at runtime rather than only via subclassing.
+
+</details>
+
+<details id="iterator-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Iterator pattern solve, and where is it already built into Java?</summary>
+
+Lets client code traverse a collection's elements sequentially without exposing or coupling to the
+collection's internal representation. Built directly into Java as `Iterable`/`Iterator`
+(`hasNext()`/`next()`), which is what powers the for-each loop under the hood.
+
+</details>
+
+<details id="why-template-method-is-final">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is Template Method's main method usually declared `final` in the base class?</summary>
+
+To prevent subclasses from overriding the overall algorithm *sequence* itself — only the
+designated hook steps should vary. If the template method weren't `final`, a subclass could
+override the whole flow, defeating the pattern's purpose of guaranteeing a consistent structure
+across all subclasses.
+
+</details>
+
+Full explanation → [Behavioral Patterns I](../design-patterns/04-behavioral-patterns-i.md)
+
+## Behavioral Patterns II (7 questions)
+
+<details id="state-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the State pattern solve?</summary>
+
+An object's behavior needs to change entirely based on its internal state, without scattering
+`if (state == X)` conditionals across every method. Each state is extracted into its own class
+implementing a common interface; the context delegates to whichever state object it currently
+holds, and transitions swap that reference.
+
+</details>
+
+<details id="state-vs-strategy">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>State and Strategy have nearly identical class diagrams — what actually distinguishes them?</summary>
+
+Intent and who controls the swap. In Strategy, the client chooses and injects the strategy, and
+variants generally don't know about each other. In State, the state objects themselves usually
+trigger transitions to the next state, and the context's behavior is meant to change automatically
+as its internal state evolves.
+
+</details>
+
+<details id="chain-of-responsibility">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Chain of Responsibility pattern solve, and where does it show up in web frameworks?</summary>
+
+A request should be handled by one of several possible handlers without the sender knowing which.
+Handlers are chained together; each either processes the request or passes it along. This is
+exactly what servlet filters, Spring's `HandlerInterceptor` chain, and most middleware pipelines
+are.
+
+</details>
+
+<details id="mediator-vs-observer">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What problem does the Mediator pattern solve, and how is it different from Observer?</summary>
+
+Many objects need to communicate, but direct references between all of them create a tangled
+many-to-many web. A mediator centralizes coordination, turning many-to-many into many-to-one.
+Unlike Observer (one-directional, anonymous broadcast to subscribers), Mediator is bidirectional
+and central — participants explicitly go through it, and it often contains real coordination logic,
+not just a notify-list.
+
+</details>
+
+<details id="memento-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Memento pattern solve, and how does it preserve encapsulation?</summary>
+
+Captures and later restores an object's internal state (for undo/checkpointing) without exposing
+that state to the code doing the saving. The object itself produces an opaque memento snapshot;
+the caretaker storing mementos never reads or modifies their contents.
+
+</details>
+
+<details id="visitor-double-dispatch">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What problem does the Visitor pattern solve, and how does double dispatch make it work?</summary>
+
+Adds a new operation across a set of unrelated classes without modifying each of them. A `Visitor`
+interface has one `visit()` overload per element type; each element implements `accept(Visitor v)`
+which calls `v.visit(this)`. Double dispatch — routing based on both the element's and the
+visitor's runtime type — picks the right overload without `instanceof` checks.
+
+</details>
+
+<details id="why-visitor-is-rare">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is the Visitor pattern comparatively rare in real codebases?</summary>
+
+Adding a new operation is cheap (one new Visitor), but adding a new *element type* requires
+touching every existing Visitor implementation — the inverse tradeoff of Strategy/Template Method.
+It's a good fit only when element types are stable and operations grow, which is less common than
+the reverse in most application code.
+
+</details>
+
+Full explanation → [Behavioral Patterns II](../design-patterns/05-behavioral-patterns-ii.md)
+
+## Singleton & Thread Safety (8 questions)
+
+<details id="naive-singleton-race-condition">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's wrong with a naive lazily-initialized Singleton under multi-threaded access?</summary>
+
+Two threads can both observe `instance == null`, both pass the check, and both construct a new
+instance — a race condition that violates the entire point of Singleton. This only manifests under
+concurrent access; single-threaded code never surfaces the bug.
+
+</details>
+
+<details id="eager-vs-synchronized-singleton">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the tradeoff between eager initialization and a `synchronized getInstance()` for Singleton?</summary>
+
+Eager initialization (a `static final` field) is thread-safe via JVM class-loading guarantees, but
+creates the instance even if it's never needed — wasteful if construction is expensive. A fully
+`synchronized getInstance()` is lazy and correct, but every call pays lock-acquisition cost forever,
+even long after the instance already exists and no race is possible.
+
+</details>
+
+<details id="double-checked-locking-and-volatile">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does double-checked locking make Singleton thread-safe without paying a lock on every call, and why is `volatile` required?</summary>
+
+Checks `instance == null` once lock-free (fast path for all calls after the first), and only
+acquires the lock — with a second check inside it — on the rare first call. `volatile` is required
+because `new` is not atomic (allocate, construct, assign); without it the compiler/JIT can reorder
+the assignment before the constructor finishes, letting another thread see a non-null reference to
+a partially-initialized object.
+
+</details>
+
+<details id="holder-idiom">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the initialization-on-demand holder idiom, and why is it thread-safe without any explicit locking?</summary>
+
+The instance is a `static final` field on a private nested class that's only loaded when
+`getInstance()` first references it. It's thread-safe because JVM class loading is already
+guaranteed atomic and happens-before, the same guarantee eager initialization relies on — but
+deferred until first use instead of paid upfront.
+
+</details>
+
+<details id="enum-singleton">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is enum singleton considered the safest Singleton implementation in Java?</summary>
+
+It closes two attack vectors other approaches don't: reflection can't instantiate `enum` types (JVM
+forbids it), and enums serialize by name, guaranteed by the JVM to deserialize back to the same
+constant with no extra `readResolve()` code needed. The tradeoff is it can't extend another class.
+
+</details>
+
+<details id="reflection-attack-on-singleton">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How can reflection break a standard Singleton, and why doesn't that work against an enum singleton?</summary>
+
+`Class.getDeclaredConstructors()` plus `setAccessible(true)` can call a `private` constructor
+directly, minting a second instance regardless of `getInstance()`'s null checks. The JVM
+specifically forbids reflective instantiation of `enum` types, so this attack fails at runtime
+against an enum singleton.
+
+</details>
+
+<details id="serialization-attack-on-singleton">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How can Java serialization silently create a second Singleton instance, and how do you prevent it?</summary>
+
+Deserialization bypasses constructors entirely, producing a brand-new object by default unless the
+class implements `readResolve()` to return the existing instance instead. Enum singletons avoid
+this entirely — the JVM guarantees deserialization resolves back to the same enum constant with no
+extra code.
+
+</details>
+
+<details id="spring-singleton-scope">
+<summary><span className="qb-badge qb-badge--core">Core</span>Spring beans are singletons by default — why doesn't application code need any of the GoF Singleton boilerplate?</summary>
+
+The IoC container itself holds one shared instance per bean definition and hands out the same
+reference to every injection point — no private constructor or double-checked locking required in
+the bean's own class. The safety concerns are the container's responsibility, not the class's.
+
+</details>
+
+Full explanation → [Singleton & Thread Safety](../design-patterns/06-singleton-and-thread-safety.md)
+
+## Dependency Injection & Enterprise Patterns (6 questions)
+
+<details id="ioc-vs-di">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between Inversion of Control and Dependency Injection?</summary>
+
+IoC is the general principle: control over flow/object-creation is handed to an external
+framework/container instead of the class managing it itself. Dependency Injection is the specific,
+most common technique for achieving IoC — a class declares what it needs (typically via
+constructor parameters) instead of constructing dependencies itself.
+
+</details>
+
+<details id="constructor-vs-setter-vs-field-injection">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the three ways to inject a dependency, and why is constructor injection generally preferred?</summary>
+
+Constructor injection (params on the constructor) enables `final` fields, makes required
+dependencies impossible to forget, and needs no container to unit test. Setter injection allows
+optional dependencies but permits incomplete construction. Field injection (`@Autowired` on a
+field) is least boilerplate but hides dependencies and requires a container/reflection to
+construct — constructor injection is the recommended default.
+
+</details>
+
+<details id="di-vs-service-locator">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between Dependency Injection and the Service Locator pattern, and why is DI usually preferred?</summary>
+
+Service Locator has the class actively ask a central registry for what it needs at runtime, hiding
+the dependency inside the method body and coupling the class to the locator. DI has the class
+declare what it needs with no registry involved. DI is preferred because the dependency list is
+explicit and the class is trivially testable by passing in a fake directly.
+
+</details>
+
+<details id="di-container-vs-factory">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does a DI container relate to the Factory pattern?</summary>
+
+A DI container is doing what a Factory does — deciding what concrete class to instantiate behind
+an interface — but generalized: it wires an entire object graph recursively, manages lifecycle/scope,
+and does it via configuration/annotations. A hand-written Factory still fits a narrow, one-off
+creation decision; a container fits once wiring many interdependent components becomes its own
+burden.
+
+</details>
+
+<details id="dao-vs-repository">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a DAO and a Repository?</summary>
+
+A DAO abstracts *how* to talk to a specific data source, with methods mirroring the underlying
+storage operations closely. A Repository is a domain-oriented abstraction over aggregate roots,
+framed in business terms, often implemented using DAOs underneath. In practice, most Spring Data
+JPA code uses "Repository" for what's functionally a table-shaped DAO — the strict distinction is
+frequently blurred.
+
+</details>
+
+<details id="dto-vs-entity">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a DTO, and why keep it separate from the domain/JPA entity it's built from?</summary>
+
+A plain object carrying data across a process/layer boundary (e.g. a REST response body), with no
+behavior or persistence concerns. Kept separate from the entity to avoid leaking persistence
+annotations or lazy-loading proxies across the API boundary, and so a DB schema change and an API
+contract change don't have to happen together.
+
+</details>
+
+Full explanation → [Dependency Injection & Enterprise Patterns](../design-patterns/07-dependency-injection-and-enterprise-patterns.md)
+
+## Concurrency Patterns (6 questions)
+
+<details id="producer-consumer-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Producer-Consumer pattern solve, and how does a bounded queue provide backpressure?</summary>
+
+Decouples producers and consumers running at different speeds via a thread-safe queue between
+them. A bounded queue additionally blocks producers when full, so a fast producer can't run a slow
+consumer out of memory. `BlockingQueue`'s `put()`/`take()` implement this directly.
+
+</details>
+
+<details id="thread-pool-sizing">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the Thread Pool pattern solve, and how should you size a pool for CPU-bound vs. I/O-bound work?</summary>
+
+Avoids the cost and unbounded growth of creating a new OS thread per task by reusing a fixed pool
+of worker threads pulling from a shared queue. Size roughly to `#cores` for CPU-bound work; larger
+for I/O-bound work, since threads spend most of their time blocked rather than computing.
+
+</details>
+
+<details id="future-vs-promise">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a Future and a Promise, and which one is `CompletableFuture`?</summary>
+
+A Future supports blocking retrieval (`get()`) and cancellation but can't chain callbacks. A
+Promise additionally supports composing/chaining dependent async steps without blocking at each
+stage. `CompletableFuture`, despite its name, is a Promise-style API (`thenApply`, `thenCompose`,
+etc.).
+
+</details>
+
+<details id="active-object-pattern">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What is the Active Object pattern, and what real-world frameworks implement it?</summary>
+
+Turns method calls into queued Command objects processed one at a time by the object's own
+dedicated worker thread, with the caller immediately getting back a Future rather than blocking.
+Actor-model frameworks like Akka (and early Android `AsyncTask`) work this way — each actor
+processes its own mailbox serially.
+
+</details>
+
+<details id="monitor-object-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Monitor Object pattern, and how does Java's `synchronized` keyword implement it directly?</summary>
+
+Every method touching shared state acquires the object's own intrinsic lock for the call's
+duration, so only one thread executes inside a critical section at a time, and callers get a
+direct synchronous return value. A `synchronized` method in Java is exactly this — the object's
+monitor lock guards the method body.
+
+</details>
+
+<details id="active-object-vs-monitor-object">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between Active Object and Monitor Object?</summary>
+
+Both make an object safe under concurrent calls, but Active Object decouples the caller's thread
+from execution (calls queued, executed elsewhere, results via Future) while Monitor Object keeps
+calls synchronous (the caller's own thread runs the method, serialized against others via a lock).
+
+</details>
+
+Full explanation → [Concurrency Patterns](../design-patterns/08-concurrency-patterns.md)
+
+## Anti-Patterns & Pattern Selection (6 questions)
+
+<details id="god-object">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a God Object, and why does it violate the Single Responsibility Principle?</summary>
+
+A single class that knows about or does far too much (validation, persistence, business logic,
+formatting), instead of splitting responsibilities across focused collaborators. It's recognizable
+by symptoms — a class most of the codebase imports and that every unrelated feature seems to
+require touching — rather than a line count.
+
+</details>
+
+<details id="singleton-abuse">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What does "Singleton abuse" mean, and what's the tell that a Singleton is really just a disguised global variable?</summary>
+
+Using Singleton not because the domain requires exactly one instance, but to smuggle in global
+mutable state while it looks like a design pattern. The tell: tests can't run in isolation because
+they both touch the same Singleton's mutable state. The fix is generally to inject the dependency
+instead of reaching for a static `getInstance()`.
+
+</details>
+
+<details id="golden-hammer">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What is the Golden Hammer anti-pattern?</summary>
+
+Reaching for one familiar pattern/tool to solve every problem regardless of fit — over-applying
+Strategy or Factory where a simple `if` or direct instantiation would be clearer. Patterns should
+manage genuine variation; adding one where there's no real variation just adds indirection.
+
+</details>
+
+<details id="pattern-for-patterns-sake">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's wrong with introducing a design pattern speculatively, before a second concrete variant actually exists?</summary>
+
+It trades immediate simplicity for flexibility that may never be needed, and the added indirection
+makes the actual current behavior harder to trace. The general rule: introduce a pattern once a
+second concrete variant actually exists or is concretely imminent, not speculatively.
+
+</details>
+
+<details id="anemic-domain-model">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What is an Anemic Domain Model, and why is it common in layered Spring/JPA codebases?</summary>
+
+Entity/domain classes that are pure data bags (fields + getters/setters, no behavior), with all
+business logic living in separate service classes — inverting OO design. It's common because it's
+often the default shape a `@Entity` + `@Service` layering falls into unless actively pushed back
+against.
+
+</details>
+
+<details id="pattern-selection-heuristic">
+<summary><span className="qb-badge qb-badge--core">Core</span>How should you approach a "design me a ___" pattern-selection interview question?</summary>
+
+Name the actual variation point first (what varies, what stays fixed) before naming any pattern.
+Match its kind to a category (creation/composition/communication/concurrency/layering). State the
+tradeoff the pattern buys, not just its name. And explicitly ask whether a pattern is even needed
+yet, rather than defaulting to one speculatively.
+
+</details>
+
+Full explanation → [Anti-Patterns & Pattern Selection](../design-patterns/09-anti-patterns-and-pattern-selection.md)
