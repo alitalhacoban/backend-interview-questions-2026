@@ -1,0 +1,8 @@
+.menu {
+  padding: 0.5rem;
+  overflow-x: hidden;
+}
+
+.menuWithAnnouncementBar {
+  margin-top: var(--docusaurus-announcement-bar-height);
+}

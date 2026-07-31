@@ -5,6 +5,7 @@
 // See: https://docusaurus.io/docs/api/docusaurus-config
 
 import {themes as prismThemes} from 'prism-react-renderer';
+import {topics, totalQuestions} from './src/data/topics.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -15,7 +16,26 @@ const projectName = 'backend-interview-questions-2026';
 const config = {
   title: 'Backend Interview Questions 2026',
   tagline: 'A growing reference for backend engineering interviews',
-  favicon: 'img/favicon.png',
+  favicon: 'img/backend-interview-logo.svg',
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'shortcut icon',
+        type: 'image/png',
+        sizes: '48x48',
+        href: `/${projectName}/img/backend-interview-logo-48.png`,
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: `/${projectName}/img/backend-interview-apple-touch-icon.png`,
+      },
+    },
+  ],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -69,6 +89,8 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
+          sidebarCollapsible: true,
+          sidebarCollapsed: true,
           editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
         },
         blog: false,
@@ -97,40 +119,15 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'docsSidebar',
+            sidebarId: 'learnSidebar',
             position: 'left',
-            label: 'Topics',
+            label: 'Learn',
           },
           {
-            type: 'dropdown',
-            label: 'Question Bank',
+            type: 'docSidebar',
+            sidebarId: 'questionBankSidebar',
+            label: `Practice · ${totalQuestions} Questions`,
             position: 'left',
-            items: [
-              {
-                to: '/docs/question-bank/kafka',
-                label: 'Kafka',
-              },
-              {
-                to: '/docs/question-bank/java-core',
-                label: 'Java Core',
-              },
-              {
-                to: '/docs/question-bank/spring-boot',
-                label: 'Spring Boot',
-              },
-              {
-                to: '/docs/question-bank/dbms',
-                label: 'DBMS',
-              },
-              {
-                to: '/docs/question-bank/design-patterns',
-                label: 'Design Patterns',
-              },
-              {
-                to: '/docs/question-bank/microservices',
-                label: 'Microservices',
-              },
-            ],
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
@@ -144,61 +141,17 @@ const config = {
         links: [
           {
             title: 'Topics',
-            items: [
-              {
-                label: 'Kafka',
-                to: '/docs/kafka/fundamentals',
-              },
-              {
-                label: 'Java Core',
-                to: '/docs/java-core/oop-fundamentals',
-              },
-              {
-                label: 'Spring Boot',
-                to: '/docs/spring-boot/spring-and-spring-boot-fundamentals',
-              },
-              {
-                label: 'DBMS',
-                to: '/docs/dbms/dbms-fundamentals',
-              },
-              {
-                label: 'Design Patterns',
-                to: '/docs/design-patterns/design-patterns-fundamentals',
-              },
-              {
-                label: 'Microservices',
-                to: '/docs/microservices/microservices-fundamentals',
-              },
-            ],
+            items: topics.map((topic) => ({
+              label: topic.title,
+              to: topic.learnTo,
+            })),
           },
           {
             title: 'Question Bank',
-            items: [
-              {
-                label: 'Kafka',
-                to: '/docs/question-bank/kafka',
-              },
-              {
-                label: 'Java Core',
-                to: '/docs/question-bank/java-core',
-              },
-              {
-                label: 'Spring Boot',
-                to: '/docs/question-bank/spring-boot',
-              },
-              {
-                label: 'DBMS',
-                to: '/docs/question-bank/dbms',
-              },
-              {
-                label: 'Design Patterns',
-                to: '/docs/question-bank/design-patterns',
-              },
-              {
-                label: 'Microservices',
-                to: '/docs/question-bank/microservices',
-              },
-            ],
+            items: topics.map((topic) => ({
+              label: `${topic.title} (${topic.questionCount})`,
+              to: topic.practiceTo,
+            })),
           },
           {
             title: 'More',

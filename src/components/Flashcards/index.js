@@ -16,7 +16,7 @@ function shuffle(array) {
 // and stripping those inline styles is what makes a not-yet-opened answer
 // actually visible once it's copied onto the back of a card below.
 function collectCards() {
-  return Array.from(document.querySelectorAll('article details'))
+  return Array.from(document.querySelectorAll('article details:not([hidden])'))
     .map((details) => {
       const summary = details.querySelector(':scope > summary');
       if (!summary) {
@@ -38,7 +38,7 @@ function collectCards() {
     .filter(Boolean);
 }
 
-export default function Flashcards() {
+export default function Flashcards({compact = false}) {
   const [open, setOpen] = useState(false);
   const [cards, setCards] = useState([]);
   const [index, setIndex] = useState(0);
@@ -89,7 +89,7 @@ export default function Flashcards() {
 
   return (
     <>
-      <div className={styles.controls}>
+      <div className={compact ? styles.controlsCompact : styles.controls}>
         <button
           type="button"
           className="button button--secondary button--sm"

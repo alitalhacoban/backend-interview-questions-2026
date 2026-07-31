@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './styles.module.css';
 
 function setAllDetails(open) {
-  document.querySelectorAll('article details').forEach((details) => {
+  document.querySelectorAll('article details:not([hidden])').forEach((details) => {
     // Docusaurus's <details> tracks open/closed via React state
     // (`data-collapsed`) and a CSS height animation, not the native `open`
     // attribute, so it must be toggled by simulating a click on <summary>.
@@ -13,9 +13,9 @@ function setAllDetails(open) {
   });
 }
 
-export default function ExpandCollapseAll() {
+export default function ExpandCollapseAll({compact = false}) {
   return (
-    <div className={styles.controls}>
+    <div className={compact ? styles.controlsCompact : styles.controls}>
       <button
         type="button"
         className="button button--secondary button--sm"

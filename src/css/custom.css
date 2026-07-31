@@ -4,30 +4,94 @@
  * work well for content-centric websites.
  */
 
-/* Brand palette: indigo, chosen to stand apart from the default Infima
-   green/teal every unmodified Docusaurus site ships with. */
+/* Neutral reading palette: soft whites and charcoal tones reduce color fatigue. */
 :root {
-  --ifm-color-primary: #4c5fd5;
-  --ifm-color-primary-dark: #2f45c9;
-  --ifm-color-primary-darker: #2a3db4;
-  --ifm-color-primary-darkest: #202e87;
-  --ifm-color-primary-light: #6575db;
-  --ifm-color-primary-lighter: #7988e0;
-  --ifm-color-primary-lightest: #a7b0ea;
+  --ifm-color-primary: #27272a;
+  --ifm-color-primary-dark: #18181b;
+  --ifm-color-primary-darker: #111113;
+  --ifm-color-primary-darkest: #09090b;
+  --ifm-color-primary-light: #3f3f46;
+  --ifm-color-primary-lighter: #52525b;
+  --ifm-color-primary-lightest: #e4e4e7;
+  --ifm-color-primary-contrast-background: #e4e4e7;
+  --ifm-color-primary-contrast-foreground: #18181b;
+  --ifm-background-color: #fafafa;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-font-color-base: #27272a;
+  --ifm-heading-color: #18181b;
+  --ifm-color-emphasis-100: #f4f4f5;
+  --ifm-color-emphasis-200: #e4e4e7;
+  --ifm-color-emphasis-300: #d4d4d8;
   --ifm-code-font-size: 95%;
+  --ifm-line-height-base: 1.7;
+  --practice-color: #3f3f46;
+  --practice-contrast: #ffffff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #8b93f0;
-  --ifm-color-primary-dark: #6771eb;
-  --ifm-color-primary-darker: #505ce8;
-  --ifm-color-primary-darkest: #1f2ee2;
-  --ifm-color-primary-light: #a6acf4;
-  --ifm-color-primary-lighter: #bdc1f6;
-  --ifm-color-primary-lightest: #eef0fd;
+html[data-theme='dark'] {
+  --ifm-color-primary: #d4d4d8;
+  --ifm-color-primary-dark: #a1a1aa;
+  --ifm-color-primary-darker: #71717a;
+  --ifm-color-primary-darkest: #52525b;
+  --ifm-color-primary-light: #e4e4e7;
+  --ifm-color-primary-lighter: #f4f4f5;
+  --ifm-color-primary-lightest: #fafafa;
+  --ifm-color-primary-contrast-background: #3f3f46;
+  --ifm-color-primary-contrast-foreground: #f4f4f5;
+  --ifm-background-color: #121212;
+  --ifm-background-surface-color: #1c1c1f;
+  --ifm-font-color-base: #d4d4d8;
+  --ifm-heading-color: #f4f4f5;
+  --ifm-color-emphasis-100: #1c1c1f;
+  --ifm-color-emphasis-200: #27272a;
+  --ifm-color-emphasis-300: #3f3f46;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --practice-color: #d4d4d8;
+  --practice-contrast: #18181b;
+}
+
+.hero--primary {
+  --ifm-hero-background-color: #18181b;
+  --ifm-hero-text-color: #ffffff;
+}
+
+html[data-theme='dark'] .hero--primary {
+  --ifm-hero-background-color: #09090b;
+  --ifm-hero-text-color: #ffffff;
+}
+
+.hero--primary .hero__title,
+.hero--primary .hero__subtitle {
+  color: var(--ifm-hero-text-color);
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #18181b;
+  --ifm-footer-color: #d4d4d8;
+  --ifm-footer-link-color: #d4d4d8;
+  --ifm-footer-link-hover-color: #ffffff;
+  --ifm-footer-title-color: #ffffff;
+}
+
+/* In a monochrome palette, links need a non-color cue to remain discoverable. */
+.markdown a:not(.button) {
+  text-decoration: underline;
+  text-decoration-color: var(--ifm-color-emphasis-500);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.markdown a:not(.button):hover {
+  text-decoration-thickness: 2px;
+}
+
+.sidebar-practice-overview > .menu__link {
+  margin-bottom: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--practice-color) 45%, transparent);
+  background: color-mix(in srgb, var(--practice-color) 10%, transparent);
+  color: var(--practice-color);
+  font-weight: 700;
 }
 
 /* Question Bank difficulty badges */
@@ -44,23 +108,23 @@
 }
 
 .qb-badge--core {
-  background: rgba(46, 133, 85, 0.15);
-  color: var(--ifm-color-primary-darker);
+  background: #e4e4e7;
+  color: #27272a;
 }
 
-[data-theme='dark'] .qb-badge--core {
-  background: rgba(37, 194, 160, 0.18);
-  color: var(--ifm-color-primary-light);
+html[data-theme='dark'] .qb-badge--core {
+  background: #3f3f46;
+  color: #f4f4f5;
 }
 
 .qb-badge--edge {
-  background: rgba(230, 126, 34, 0.15);
-  color: #a35708;
+  background: #d4d4d8;
+  color: #18181b;
 }
 
-[data-theme='dark'] .qb-badge--edge {
-  background: rgba(230, 126, 34, 0.22);
-  color: #f0a35c;
+html[data-theme='dark'] .qb-badge--edge {
+  background: #52525b;
+  color: #fafafa;
 }
 
 /* Print view: strip chrome and answers, leave a self-quiz question list */

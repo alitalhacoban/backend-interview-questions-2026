@@ -5,10 +5,11 @@ import Layout from '@theme/Layout';
 
 import Heading from '@theme/Heading';
 import HomepageTopics from '@site/src/components/HomepageTopics';
+import {totalQuestions} from '@site/src/data/topics';
 import styles from './index.module.css';
 
 const stats = [
-  {value: '337', label: 'Questions'},
+  {value: String(totalQuestions), label: 'Questions'},
   {value: '6', label: 'Topics'},
   {value: '110', label: 'Pages'},
 ];
@@ -35,16 +36,22 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
+        <div className={styles.journeyGrid}>
           <Link
-            className="button button--secondary button--lg"
+            className={styles.journeyCard}
             to="/docs/kafka/fundamentals">
-            Browse the Topics →
+            <span className={styles.journeyIcon} aria-hidden="true">▤</span>
+            <strong>Learn a Topic</strong>
+            <small>Explanations, diagrams, and code examples</small>
+            <span>Start learning →</span>
           </Link>
           <Link
-            className="button button--secondary button--lg"
-            to="/docs/question-bank/kafka">
-            Browse the Question Bank →
+            className={`${styles.journeyCard} ${styles.practiceJourney}`}
+            to="/docs/question-bank">
+            <span className={styles.journeyIcon} aria-hidden="true">◎</span>
+            <strong>Practice Questions</strong>
+            <small>{totalQuestions} answers and shuffled flashcards</small>
+            <span>Start practicing →</span>
           </Link>
         </div>
       </div>

@@ -1,0 +1,37 @@
+.callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--practice-color) 45%, transparent);
+  border-left: 4px solid var(--practice-color);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--practice-color) 8%, transparent);
+}
+
+.callout strong,
+.callout span {
+  display: block;
+}
+
+.callout span {
+  margin-top: 0.2rem;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.86rem;
+}
+
+.callout a {
+  flex-shrink: 0;
+  border-color: var(--practice-color);
+  background: var(--practice-color);
+  color: var(--practice-contrast);
+}
+
+@media (max-width: 600px) {
+  .callout {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

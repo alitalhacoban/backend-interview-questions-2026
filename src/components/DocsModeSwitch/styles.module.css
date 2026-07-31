@@ -1,0 +1,45 @@
+.switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  margin: 0.75rem;
+  padding: 0.25rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 10px;
+  background: var(--ifm-color-emphasis-100);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.4rem 0.5rem;
+  border-radius: 7px;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.option:hover {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.active,
+.activePractice {
+  background: var(--ifm-background-surface-color);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+  color: var(--ifm-color-primary);
+}
+
+.activePractice {
+  color: var(--practice-color);
+}

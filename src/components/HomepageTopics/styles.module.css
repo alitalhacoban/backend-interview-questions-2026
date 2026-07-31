@@ -11,8 +11,7 @@
   transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
 
-.card:hover,
-.card:focus {
+.card:hover {
   border-color: var(--ifm-color-primary);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -37,14 +36,48 @@
   flex-shrink: 0;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary-contrast-foreground);
   background: var(--ifm-color-primary-contrast-background);
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
 }
 
 .cardDescription {
-  margin: 0;
+  flex: 1;
+  margin: 0 0 1rem;
   font-size: 0.9rem;
   color: var(--ifm-color-emphasis-700);
+}
+
+.cardActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.learnLink,
+.practiceLink {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--ifm-color-primary);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.practiceLink {
+  border-color: var(--practice-color);
+  background: var(--practice-color);
+  color: var(--practice-contrast);
+}
+
+.learnLink:hover,
+.practiceLink:hover {
+  text-decoration: none;
+}
+
+.practiceLink:hover {
+  color: var(--practice-contrast);
+  filter: brightness(1.08);
 }

@@ -1,0 +1,47 @@
+.panel {
+  margin: 1.25rem 0 2rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--practice-color) 38%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--practice-color) 7%, transparent);
+}
+
+.headingRow,
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.headingRow {
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.headingRow {
+  margin-bottom: 0.8rem;
+}
+
+.headingRow strong,
+.headingRow span {
+  display: block;
+}
+
+.headingRow span {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.78rem;
+}
+
+.actions {
+  gap: 0.4rem;
+}
+
+@media (max-width: 700px) {
+  .headingRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+}
