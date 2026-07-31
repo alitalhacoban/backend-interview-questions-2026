@@ -1,6 +1,24 @@
 {
   "name": "backend-interview-questions-2026",
   "version": "0.0.0",
+  "description": "A free, open-source reference of 337 backend engineering interview questions and answers — Java, Spring Boot, Kafka, DBMS, Design Patterns, and Microservices — built with Docusaurus.",
+  "keywords": [
+    "backend interview questions",
+    "java interview questions",
+    "spring boot interview questions",
+    "kafka interview questions",
+    "dbms interview questions",
+    "design patterns interview questions",
+    "microservices interview questions",
+    "system design",
+    "docusaurus"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alitalhacoban/backend-interview-questions-2026.git"
+  },
+  "homepage": "https://alitalhacoban.github.io/backend-interview-questions-2026/",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

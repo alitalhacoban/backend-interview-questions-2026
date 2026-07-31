@@ -1,0 +1,30 @@
+# Backend Interview Questions 2026
+
+> A free, open-source reference of 337 backend engineering interview questions and answers,
+> covering Java, Spring Boot, Kafka, DBMS, Design Patterns, and Microservices.
+
+Each topic page explains how the underlying technology actually works — not just vocabulary —
+paired with a diagram, a realistic Java/Spring Boot code example, and an "Interview Questions"
+callout. A separate Question Bank page per topic pairs every question on the site with a
+condensed answer, grouped by subtopic, for fast self-testing without re-reading the prose. Aimed
+at backend developers with roughly 0-2 years of experience, but useful as a refresher for anyone.
+
+## Topics
+
+- [Kafka](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/category/kafka): architecture, producer internals, consumer groups and rebalancing, delivery semantics, replication and ISR, the outbox/inbox pattern, common production pitfalls (44 questions)
+- [Java Core](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/category/java-core): OOP fundamentals, JVM and memory model, collections framework, exception handling, concurrency, generics and type erasure, streams and functional interfaces, string/object contracts (50 questions)
+- [Spring Boot](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/category/spring-boot): Spring and Spring Boot fundamentals, IoC and dependency injection, auto-configuration and starters, Spring MVC and REST, Spring Data JPA and transactions, AOP and proxies, Spring Security, testing, configuration/Actuator, design patterns in Spring's own APIs (61 questions)
+- [DBMS](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/category/dbms): relational theory, keys and SQL, normalization, indexing, transactions and ACID, concurrency control and isolation levels, query optimization, storage and recovery, replication/sharding/NoSQL (59 questions)
+- [Design Patterns](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/category/design-patterns): GoF creational, structural, and behavioral patterns, Singleton and thread safety, dependency injection and enterprise patterns, concurrency patterns, anti-patterns/pattern selection (64 questions)
+- [Microservices](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/category/microservices): microservices fundamentals, service communication, API gateways and service discovery, data management and distributed transactions, resilience patterns, observability, deployment and orchestration, security, anti-patterns/trade-offs (59 questions)
+
+## Question Bank
+
+Every question on the site with a condensed answer, grouped by subtopic:
+
+- [Kafka Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/kafka)
+- [Java Core Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/java-core)
+- [Spring Boot Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/spring-boot)
+- [DBMS Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/dbms)
+- [Design Patterns Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/design-patterns)
+- [Microservices Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/microservices)

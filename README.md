@@ -1,40 +1,104 @@
 # Backend Interview Questions 2026
 
-A self-hosted, growing reference for backend engineering interview preparation, built with
-[Docusaurus](https://docusaurus.io/). Each topic explains the underlying mechanics of a
-technology or pattern, not just the vocabulary, and pairs the explanation with diagrams, real
-Java/Spring Boot code examples, and a set of interview questions the page prepares you to answer.
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Live site](https://img.shields.io/badge/docs-live%20site-3ecc5f)](https://alitalhacoban.github.io/backend-interview-questions-2026/)
+
+**Backend Interview Questions 2026** is a free, open-source reference of **337 backend
+engineering interview questions and answers**, covering Java, Spring Boot, Kafka, DBMS, Design
+Patterns, and Microservices. Each topic explains how the technology actually works &mdash; not
+just definitions &mdash; paired with diagrams, real Java/Spring Boot code examples, and interview
+questions. Built with [Docusaurus](https://docusaurus.io/).
 
 It's aimed at backend developers with roughly 0-2 years of experience preparing for interviews
 that go beyond surface-level definitions, but should be a useful refresher for anyone.
 
-Live site: `https://alitalhacoban.github.io/backend-interview-questions-2026/`
+**Browse the live site: [alitalhacoban.github.io/backend-interview-questions-2026](https://alitalhacoban.github.io/backend-interview-questions-2026/)**
+
+### Contents
+
+- [What's covered so far](#whats-covered-so-far)
+- [Sample questions](#sample-questions)
+- [Content structure](#content-structure)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
 
 ## What's covered so far
 
-- **Kafka** &mdash; architecture and fundamentals, producer internals, consumer groups and
-  rebalancing, delivery semantics, replication and ISR, the outbox/inbox pattern, and common
-  production pitfalls.
-- **Java Core** &mdash; OOP fundamentals, the JVM and memory model, the collections framework,
-  exception handling, concurrency, generics and type erasure, streams and functional interfaces,
-  and string/object contracts.
-- **Spring Boot** &mdash; Spring and Spring Boot fundamentals, IoC and dependency injection,
-  auto-configuration and starters, Spring MVC and REST, Spring Data JPA and transactions, AOP and
-  proxies, Spring Security, testing, configuration/profiles/Actuator, and design patterns as they
-  actually show up in Spring's own APIs.
-- **DBMS** &mdash; relational theory, keys and SQL, normalization, indexing, transactions and
-  ACID, concurrency control and isolation levels, query optimization, storage and recovery, and
-  replication/sharding/NoSQL.
-- **Design Patterns** &mdash; GoF creational, structural, and behavioral patterns, Singleton and
-  thread safety, dependency injection and enterprise patterns, concurrency patterns, and
-  anti-patterns/pattern selection.
-- **Microservices** &mdash; microservices fundamentals, service communication, API gateways and
-  service discovery, data management and distributed transactions, resilience patterns,
-  observability, deployment and orchestration, security, and anti-patterns/trade-offs.
+337 questions across 6 topics so far:
+
+- **Kafka** (44 questions) &mdash; architecture and fundamentals, producer internals, consumer
+  groups and rebalancing, delivery semantics, replication and ISR, the outbox/inbox pattern, and
+  common production pitfalls.
+- **Java Core** (50 questions) &mdash; OOP fundamentals, the JVM and memory model, the collections
+  framework, exception handling, concurrency, generics and type erasure, streams and functional
+  interfaces, and string/object contracts.
+- **Spring Boot** (61 questions) &mdash; Spring and Spring Boot fundamentals, IoC and dependency
+  injection, auto-configuration and starters, Spring MVC and REST, Spring Data JPA and
+  transactions, AOP and proxies, Spring Security, testing, configuration/profiles/Actuator, and
+  design patterns as they actually show up in Spring's own APIs.
+- **DBMS** (59 questions) &mdash; relational theory, keys and SQL, normalization, indexing,
+  transactions and ACID, concurrency control and isolation levels, query optimization, storage and
+  recovery, and replication/sharding/NoSQL.
+- **Design Patterns** (64 questions) &mdash; GoF creational, structural, and behavioral patterns,
+  Singleton and thread safety, dependency injection and enterprise patterns, concurrency patterns,
+  and anti-patterns/pattern selection.
+- **Microservices** (59 questions) &mdash; microservices fundamentals, service communication, API
+  gateways and service discovery, data management and distributed transactions, resilience
+  patterns, observability, deployment and orchestration, security, and anti-patterns/trade-offs.
 
 More topics (PostgreSQL, Redis, distributed systems, API security, and others) will be added over
 time. This is a living project: expect new topics and new questions to show up on existing pages
 as the content grows.
+
+## Sample questions
+
+A taste of the depth &mdash; one question per topic, condensed. Full explanations, diagrams, and
+code live on the site.
+
+**Q: What's the difference between a Kafka topic and a traditional message queue?**
+A: A traditional queue (RabbitMQ, ActiveMQ) removes a message once a worker consumes it, and
+workers compete for individual messages. Kafka is an append-only, distributed commit log: messages
+aren't deleted on read, multiple independent consumer groups can each read the full stream, and a
+new consumer can replay history from the beginning.
+[Read more →](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/kafka/fundamentals)
+
+**Q: What's the practical difference between an abstract class and an interface in modern Java?**
+A: An abstract class can hold instance state and a constructor but a class can extend only one; an
+interface can't hold instance state (only constants) but a class can implement many. Use an
+abstract class when subclasses share real state/implementation in a genuine "is-a" hierarchy; use
+an interface to define a capability unrelated classes can plug into.
+[Read more →](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/java-core/oop-fundamentals)
+
+**Q: What is Spring Boot, and is it a replacement for the Spring Framework?**
+A: No &mdash; Spring Boot is built directly on top of the Spring Framework, not a replacement for
+it. It's an opinionated layer that eliminates setup boilerplate via auto-configuration, curated
+starter dependencies, an embedded server, and production-ready features like Actuator.
+[Read more →](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/spring-boot/spring-and-spring-boot-fundamentals)
+
+**Q: What's the difference between OLTP and OLAP systems?**
+A: OLTP handles a high volume of short, simple transactions (inserts, point updates) and is
+optimized for fast writes on row-oriented storage. OLAP handles complex, read-heavy analytical
+queries over large historical datasets and is optimized with columnar storage for
+scanning/aggregating many rows across few columns.
+[Read more →](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/dbms/dbms-fundamentals)
+
+**Q: What's the difference between a design pattern and an anti-pattern?**
+A: A design pattern is a proven solution. An anti-pattern is a commonly-repeated shape that looks
+reasonable but reliably causes problems &mdash; e.g. God Object, Singleton abuse, Golden Hammer.
+It's not "the opposite" of a pattern, it's a recognizable recurring shape that experience shows is
+bad.
+[Read more →](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/design-patterns/design-patterns-fundamentals)
+
+**Q: What's the difference between a monolith, microservices, and SOA?**
+A: A monolith is a single deployable unit where components talk via in-process calls and usually
+share one database. Microservices are many small, independently deployable services, each owning
+its own data, communicating over the network. SOA is the broader, older style microservices grew
+out of, classically relying on a centralized Enterprise Service Bus for routing/orchestration.
+[Read more →](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/microservices/microservices-fundamentals)
+
+Every question on the site (with a condensed answer, grouped by subtopic) also lives in the
+[Question Bank](https://alitalhacoban.github.io/backend-interview-questions-2026/docs/question-bank/kafka)
+for fast self-testing.
 
 ## Content structure
 
@@ -121,4 +185,7 @@ npm run serve
    short answer, in the subtopic's section.
 4. Run `npm start` locally and confirm both the page and its Question Bank entry render as
    expected before opening a PR.
-5. Open a pull request describing what you added or changed and why.
+5. If you added a brand-new topic folder, update the topic list and question counts in this
+   README's [What's covered so far](#whats-covered-so-far) section and the `## Topics` list in
+   `static/llms.txt` so they don't go stale.
+6. Open a pull request describing what you added or changed and why.
