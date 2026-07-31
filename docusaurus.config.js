@@ -15,7 +15,7 @@ const projectName = 'backend-interview-questions-2026';
 const config = {
   title: 'Backend Interview Questions 2026',
   tagline: 'A growing reference for backend engineering interviews',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.png',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -82,8 +82,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/social-card.jpg',
       colorMode: {
         defaultMode: 'dark',
         disableSwitch: false,
@@ -144,54 +143,59 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'Topics',
             items: [
               {
                 label: 'Kafka',
                 to: '/docs/kafka/fundamentals',
               },
               {
-                label: 'Kafka Question Bank',
-                to: '/docs/question-bank/kafka',
-              },
-              {
                 label: 'Java Core',
                 to: '/docs/java-core/oop-fundamentals',
-              },
-              {
-                label: 'Java Core Question Bank',
-                to: '/docs/question-bank/java-core',
               },
               {
                 label: 'Spring Boot',
                 to: '/docs/spring-boot/spring-and-spring-boot-fundamentals',
               },
               {
-                label: 'Spring Boot Question Bank',
-                to: '/docs/question-bank/spring-boot',
-              },
-              {
                 label: 'DBMS',
                 to: '/docs/dbms/dbms-fundamentals',
-              },
-              {
-                label: 'DBMS Question Bank',
-                to: '/docs/question-bank/dbms',
               },
               {
                 label: 'Design Patterns',
                 to: '/docs/design-patterns/design-patterns-fundamentals',
               },
               {
-                label: 'Design Patterns Question Bank',
+                label: 'Microservices',
+                to: '/docs/microservices/microservices-fundamentals',
+              },
+            ],
+          },
+          {
+            title: 'Question Bank',
+            items: [
+              {
+                label: 'Kafka',
+                to: '/docs/question-bank/kafka',
+              },
+              {
+                label: 'Java Core',
+                to: '/docs/question-bank/java-core',
+              },
+              {
+                label: 'Spring Boot',
+                to: '/docs/question-bank/spring-boot',
+              },
+              {
+                label: 'DBMS',
+                to: '/docs/question-bank/dbms',
+              },
+              {
+                label: 'Design Patterns',
                 to: '/docs/question-bank/design-patterns',
               },
               {
                 label: 'Microservices',
-                to: '/docs/microservices/microservices-fundamentals',
-              },
-              {
-                label: 'Microservices Question Bank',
                 to: '/docs/question-bank/microservices',
               },
             ],
