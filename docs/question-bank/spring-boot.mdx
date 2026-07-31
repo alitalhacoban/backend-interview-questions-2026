@@ -8,7 +8,7 @@ import Flashcards from '@site/src/components/Flashcards';
 
 # Spring Boot
 
-Every Spring Boot interview question on this site, grouped by subtopic — 54 questions across 9
+Every Spring Boot interview question on this site, grouped by subtopic — 61 questions across 10
 sections. Click a question to reveal its answer &mdash; try answering it yourself first, then
 check. Each section ends with a link to the topic's full explanation in `docs/spring-boot` if you
 need the deeper "why," diagrams, or code.
@@ -576,3 +576,82 @@ recover — often making the outage worse instead of containing it.
 </details>
 
 Full explanation → [Configuration, Profiles & Actuator](../spring-boot/09-configuration-and-actuator.md)
+
+## Design Patterns in Spring Boot (7 questions)
+
+<details id="spring-singleton-vs-gof-singleton">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Is a Spring `@Service` bean a Singleton in the classic Gang-of-Four sense? What's the actual difference?</summary>
+
+Not quite. The GoF Singleton enforces uniqueness in the class itself (private constructor, static
+accessor) — a JVM-wide guarantee. Spring's singleton scope is a **container-scoped** guarantee:
+the bean class is an ordinary class with a public constructor, and it's the `ApplicationContext`'s
+bean registry — not the class — that ensures only one instance is created and reused. Nothing stops
+`new MyService()` from producing a second, separate instance outside the container.
+
+</details>
+
+<details id="factory-method-in-spring">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does the Factory Method pattern show up in how Spring's `ApplicationContext` and `@Bean` methods work?</summary>
+
+`ApplicationContext.getBean(...)` is itself a factory method call — the caller never invokes `new`
+and doesn't know how the instance was actually built. `@Bean` methods in a `@Configuration` class
+are literal factory methods: every caller that gets that type injected receives whatever the method
+returns, with the construction logic fully hidden behind it.
+
+</details>
+
+<details id="proxy-vs-decorator-in-spring">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between the Proxy and Decorator patterns, and why do Spring's `@Transactional`/`@Cacheable` proxies arguably do both?</summary>
+
+Proxy's classic intent is controlling *access* to the real object (deciding whether/when a call
+reaches it); Decorator's intent is *adding responsibilities*. A `@Transactional` proxy controls
+*when* the real method is allowed to run (inside a transaction boundary) — access control — while a
+`@Cacheable` proxy adds a responsibility, short-circuiting the call on a cache hit. Spring's AOP
+proxies do both, which is why the mechanism is generically called "AOP proxies" rather than
+strictly one GoF name.
+
+</details>
+
+<details id="template-method-jdbctemplate">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does `JdbcTemplate` demonstrate the Template Method pattern?</summary>
+
+`JdbcTemplate.query(...)` owns the fixed algorithm skeleton — acquiring a connection, preparing and
+executing the statement, iterating the `ResultSet`, translating exceptions, and closing every
+resource even on failure — while the caller supplies only the varying step, a `RowMapper` callback
+that turns one row into an object.
+
+</details>
+
+<details id="front-controller-dispatcherservlet">
+<summary><span className="qb-badge qb-badge--core">Core</span>How is `DispatcherServlet` an example of the Front Controller pattern?</summary>
+
+Front Controller centralizes all incoming requests through one entry point that delegates to
+request-specific logic, instead of separate handlers each owning their own dispatch plumbing. Every
+HTTP request to a Spring MVC app passes through the single `DispatcherServlet`, which asks a
+`HandlerMapping` which controller method should handle it and dispatches accordingly — you never
+register a separate servlet per endpoint.
+
+</details>
+
+<details id="observer-applicationeventpublisher">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does `ApplicationEventPublisher` implement the Observer pattern, and how does it differ from publishing a Kafka event?</summary>
+
+A publisher fires an event with no reference to whichever `@EventListener`-annotated methods react
+to it — listeners register themselves independently, and the publisher never changes as listeners
+are added or removed. Unlike a Kafka event, this is synchronous and in-process by default (the
+publishing thread runs every listener before `publishEvent()` returns) and scoped to a single
+`ApplicationContext`, not cross-process or durable, unless a listener is explicitly marked `@Async`.
+
+</details>
+
+<details id="strategy-pattern-via-dependency-injection">
+<summary><span className="qb-badge qb-badge--core">Core</span>How is dependency injection itself an application of the Strategy pattern?</summary>
+
+Strategy defines interchangeable algorithms behind a common interface, chosen at runtime rather
+than hard-coded. A bean depending on an interface (e.g. `PasswordEncoder`) never chooses its own
+implementation — the container decides via `@Primary`, `@Qualifier`, or an active `@Profile` —
+so swapping the concrete strategy requires zero changes to any class that depends on the interface.
+
+</details>
+
+Full explanation → [Design Patterns in Spring Boot](../spring-boot/10-design-patterns-in-spring-boot.md)

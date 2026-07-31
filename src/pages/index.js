@@ -80,8 +80,9 @@ export default function Home() {
                     &mdash; Spring and Spring Boot fundamentals, IoC and
                     dependency injection, auto-configuration and starters,
                     Spring MVC and REST, Spring Data JPA and transactions, AOP
-                    and proxies, Spring Security, testing, and
-                    configuration/profiles/Actuator.
+                    and proxies, Spring Security, testing,
+                    configuration/profiles/Actuator, and design patterns as
+                    they actually show up in Spring's own APIs.
                   </li>
                   <li>
                     <Link to="/docs/dbms/dbms-fundamentals">DBMS</Link>{' '}
