@@ -1,9 +1,11 @@
 name: Deploy to GitHub Pages
 
+# Auto-deploy on push is temporarily disabled until the repo is ready.
+# To re-enable, uncomment the `push` trigger below.
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 permissions:
