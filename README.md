@@ -36,24 +36,6 @@ More topics (PostgreSQL, Redis, distributed systems, API security, and others) w
 time. This is a living project: expect new topics and new questions to show up on existing pages
 as the content grows.
 
-## Running locally
-
-Requires Node.js 20+.
-
-```bash
-npm install
-npm start
-```
-
-This starts the local dev server (with live reload) at `http://localhost:3000/backend-interview-questions-2026/`.
-
-To produce a static production build:
-
-```bash
-npm run build
-npm run serve
-```
-
 ## Content structure
 
 All content lives under `docs/`, organized as one folder per topic:
@@ -107,6 +89,26 @@ set to **GitHub Actions** for this to work.
 
 This is primarily a personal study reference, but corrections, clarifications, and new topics are
 welcome:
+
+### Running locally
+
+Requires Node.js 20+.
+
+```bash
+npm install
+npm start
+```
+
+This starts the local dev server (with live reload) at `http://localhost:3000/backend-interview-questions-2026/`.
+
+To produce a static production build:
+
+```bash
+npm run build
+npm run serve
+```
+
+### Steps
 
 1. Fork the repo and create a branch for your change.
 2. Follow the existing content structure for any new page: short intro, concept explanation, a
