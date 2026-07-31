@@ -73,11 +73,21 @@ export default function Home() {
                     generics and type erasure, streams and functional
                     interfaces, and string/object contracts.
                   </li>
+                  <li>
+                    <Link to="/docs/spring-boot/spring-and-spring-boot-fundamentals">
+                      Spring Boot
+                    </Link>{' '}
+                    &mdash; Spring and Spring Boot fundamentals, IoC and
+                    dependency injection, auto-configuration and starters,
+                    Spring MVC and REST, Spring Data JPA and transactions, AOP
+                    and proxies, Spring Security, testing, and
+                    configuration/profiles/Actuator.
+                  </li>
                 </ul>
                 <p>
-                  More topics (Spring Boot, PostgreSQL, Redis, distributed
-                  systems, API security, and others) will be added over time.
-                  This is a living project, not a finished one.
+                  More topics (PostgreSQL, Redis, distributed systems, API
+                  security, and others) will be added over time. This is a
+                  living project, not a finished one.
                 </p>
               </div>
             </div>

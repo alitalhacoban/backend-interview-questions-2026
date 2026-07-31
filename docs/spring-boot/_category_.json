@@ -1,0 +1,8 @@
+{
+  "label": "Spring Boot",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Spring Boot internals, request/data lifecycle, security, and testing patterns for backend engineering interviews."
+  }
+}

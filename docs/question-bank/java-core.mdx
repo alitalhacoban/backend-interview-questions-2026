@@ -8,7 +8,7 @@ import Flashcards from '@site/src/components/Flashcards';
 
 # Java Core
 
-Every Java Core interview question on this site, grouped by subtopic — 48 questions across 8
+Every Java Core interview question on this site, grouped by subtopic — 50 questions across 8
 sections. Click a question to reveal its answer &mdash; try answering it yourself first, then
 check. Each section ends with a link to the topic's full explanation in `docs/java-core` if you
 need the deeper "why," diagrams, or code.
@@ -79,7 +79,28 @@ subject to `@Override` checking against the parent's private method.
 
 Full explanation → [OOP Fundamentals](../java-core/01-oop-fundamentals.md)
 
-## JVM & Memory Model (6 questions)
+## JVM & Memory Model (8 questions)
+
+<details id="jdk-vs-jre-vs-jvm">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between the JDK, the JRE, and the JVM?</summary>
+
+The JVM is the runtime engine that executes bytecode. The JRE is the JVM plus the standard class
+libraries needed to run a compiled application (no compiler). The JDK is the JRE plus development
+tooling (`javac`, `jar`, a debugger) needed to write and compile Java code. The containment is
+`JVM ⊂ JRE ⊂ JDK`.
+
+</details>
+
+<details id="bytecode-and-jit-compilation">
+<summary><span className="qb-badge qb-badge--core">Core</span>Is Java a compiled or an interpreted language? What's the role of bytecode and the JIT compiler in how a Java program actually executes?</summary>
+
+Both, depending on which stage you mean: `javac` performs true ahead-of-time compilation from
+source to platform-independent bytecode, which the JVM then interprets instruction-by-instruction
+at first. The JIT (Just-In-Time) compiler subsequently compiles frequently-executed ("hot")
+methods into native machine code at runtime, giving Java near-native throughput for long-running
+code despite starting out interpreted.
+
+</details>
 
 <details id="jvm-runtime-data-areas">
 <summary><span className="qb-badge qb-badge--core">Core</span>What are the main runtime data areas of the JVM, and which are per-thread vs. shared across threads?</summary>

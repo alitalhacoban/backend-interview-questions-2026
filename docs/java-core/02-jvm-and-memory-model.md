@@ -12,6 +12,46 @@ misconceptions candidates walk in with. This page builds the actual mental model
 objects live, how they get reclaimed, and why applications can still leak memory despite all of
 it being automatic.
 
+## JDK, JRE, and JVM
+
+Before anything about garbage collection, most interviews open with the layering that trips up
+candidates who've only ever run `java` and `javac` without thinking about what's underneath them:
+
+- **JVM (Java Virtual Machine)**: the runtime engine that executes compiled bytecode. It's
+  platform-specific — a different JVM build per OS/architecture — but the bytecode it runs is not.
+  This is what "write once, run anywhere" actually means in practice: `javac` doesn't target a
+  specific OS, it targets the JVM's instruction set, and each platform's JVM implementation handles
+  translating that to native execution.
+- **JRE (Java Runtime Environment)**: the JVM plus the standard class libraries (`java.lang`,
+  `java.util`, ...) and supporting files needed to *run* a compiled Java application. No compiler
+  included — it's a runtime-only distribution.
+- **JDK (Java Development Kit)**: the JRE plus development tooling — `javac` (the compiler), `jar`,
+  `javadoc`, a debugger. It's the superset needed to *write and compile* Java code, not just run it.
+
+So the containment is `JVM ⊂ JRE ⊂ JDK`. (Since JDK 11, Oracle stopped shipping a separate
+standalone JRE download for most distributions, but the conceptual layering — and the interview
+question — hasn't gone away.)
+
+## Compilation model: bytecode and the JIT
+
+```mermaid
+flowchart LR
+    Src["MyClass.java"] -->|javac| Bytecode["MyClass.class\n(platform-independent bytecode)"]
+    Bytecode -->|Class Loader| Interp["Interpreter\n(executes bytecode instruction-by-instruction)"]
+    Interp -->|hot method detected| JIT["JIT Compiler"]
+    JIT -->|compiles to| Native["Native machine code\n(cached, reused on future calls)"]
+```
+
+`javac` compiles Java source into **bytecode** — an intermediate representation, not native machine
+code, which is what makes it platform-independent. At startup, the JVM's interpreter executes that
+bytecode directly, instruction by instruction. As the application runs, the **JIT (Just-In-Time)
+compiler** identifies "hot" methods — ones called often enough to be worth the compilation cost —
+and compiles them directly into native machine code on the fly, caching the result for reuse. This
+is why Java is accurately described as both compiled *and* interpreted depending on which stage
+you mean: source-to-bytecode is a true ahead-of-time compilation step, while bytecode-to-native is
+a runtime, adaptive one — and it's this hybrid model that lets Java start up quickly (interpreting
+cold code) while still reaching near-native throughput for long-running hot paths.
+
 ## JVM runtime data areas
 
 The JVM divides memory into distinct regions, each with different lifetime and sharing rules:

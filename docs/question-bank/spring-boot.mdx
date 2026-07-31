@@ -1,0 +1,578 @@
+---
+title: Spring Boot
+sidebar_label: Spring Boot
+---
+
+import ExpandCollapseAll from '@site/src/components/ExpandCollapseAll';
+import Flashcards from '@site/src/components/Flashcards';
+
+# Spring Boot
+
+Every Spring Boot interview question on this site, grouped by subtopic — 54 questions across 9
+sections. Click a question to reveal its answer &mdash; try answering it yourself first, then
+check. Each section ends with a link to the topic's full explanation in `docs/spring-boot` if you
+need the deeper "why," diagrams, or code.
+
+<ExpandCollapseAll />
+<Flashcards />
+
+## Spring & Spring Boot Fundamentals (6 questions)
+
+<details id="what-is-spring-framework">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Spring Framework, and what core problem does it solve for Java application development?</summary>
+
+Spring is a comprehensive framework for building Java applications, centered on inversion of
+control: a container constructs objects and injects their dependencies instead of objects
+constructing their own collaborators. It emerged as a lighter-weight alternative to heavyweight
+J2EE/EJB development, letting you get transaction management, data access, and web MVC using plain
+POJOs wired together declaratively.
+
+</details>
+
+<details id="what-is-spring-boot">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is Spring Boot, and is it a replacement for the Spring Framework?</summary>
+
+No — Spring Boot is built directly on top of the Spring Framework, not a replacement for it. It's
+an opinionated layer that eliminates setup boilerplate via auto-configuration, curated starter
+dependencies, an embedded server, and production-ready features like Actuator, so a
+production-ready application can be assembled almost instantly instead of hand-wired from scratch.
+
+</details>
+
+<details id="traditional-spring-vs-spring-boot">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the practical difference between a traditional, manually-configured Spring application and a Spring Boot application?</summary>
+
+Traditional Spring requires manually wiring beans via XML or `@Configuration` classes, manually
+cross-checking library versions, and deploying a WAR to an externally-managed servlet container.
+Spring Boot auto-configures sensible defaults from the classpath, manages compatible dependency
+versions through `spring-boot-starter-parent`, and packages the app as a self-contained executable
+JAR with an embedded server.
+
+</details>
+
+<details id="spring-boot-vs-spring-mvc">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between Spring Boot and Spring MVC — are they alternatives to each other?</summary>
+
+They're not alternatives — they operate at different levels. Spring MVC is a single module of the
+Spring Framework (the `DispatcherServlet`-based web/REST layer); Spring Boot is a much broader tool
+that auto-configures Spring MVC for you as just one of many things it wires up, alongside the
+embedded server, data access, and security.
+
+</details>
+
+<details id="embedded-server-and-executable-jar">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does Spring Boot default to an embedded server and an executable JAR instead of a WAR deployed to an external servlet container?</summary>
+
+Bundling the server inside the artifact makes each service fully self-contained with its own
+pinned server version, instead of sharing and drifting against an externally-managed app server —
+a much simpler fit for containerized deployment (`docker run` a single executable JAR). The
+executable "fat" JAR bundles your classes, every dependency's classes, and the embedded server,
+launched via a Spring Boot-specific `JarLauncher` that understands nested JAR-within-a-JAR layouts.
+
+</details>
+
+<details id="starter-parent-dependency-management">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What does inheriting from `spring-boot-starter-parent` actually give you?</summary>
+
+A dependency management section (a BOM) that pins compatible, tested versions for hundreds of
+common third-party libraries, plus sensible default build plugin configuration — so a starter
+dependency can be declared with no explicit `<version>` and trusted to be compatible with every
+other library in that Spring Boot release, instead of manually resolving version conflicts.
+
+</details>
+
+Full explanation → [Spring & Spring Boot Fundamentals](../spring-boot/01-spring-and-spring-boot-fundamentals.md)
+
+## IoC & Dependency Injection (6 questions)
+
+<details id="ioc-container-vs-beanfactory">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the IoC container, and what's the practical difference between `BeanFactory` and `ApplicationContext`?</summary>
+
+The IoC container constructs objects and injects their dependencies instead of objects creating
+their own collaborators. `BeanFactory` is the minimal, lazy-loading ancestor interface;
+`ApplicationContext` extends it and adds eager singleton instantiation, event publishing, and
+built-in `BeanPostProcessor` support — it's what every Spring Boot app actually runs on.
+
+</details>
+
+<details id="constructor-vs-field-injection">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is constructor injection generally preferred over field injection in Spring?</summary>
+
+It lets dependencies be `final` (no half-constructed state), makes required dependencies explicit
+so missing wiring fails at startup rather than at request time, and is trivially unit-testable
+with plain `new` — no reflection or Spring context needed.
+
+</details>
+
+<details id="bean-scopes-prototype-in-singleton">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What are the standard Spring bean scopes, and what happens if you inject a `prototype`-scoped bean into a `singleton`-scoped bean?</summary>
+
+Scopes: `singleton` (default, one instance), `prototype` (new instance per request for it),
+`request`/`session`/`application` (web-aware). Injecting a prototype into a singleton only
+resolves it once, at the singleton's construction — you silently get the same instance forever
+unless you inject an `ObjectProvider<T>` or use a scoped proxy to get a fresh one each time.
+
+</details>
+
+<details id="bean-lifecycle">
+<summary><span className="qb-badge qb-badge--core">Core</span>Walk through the Spring bean lifecycle from instantiation to destruction. Where do `BeanPostProcessor`s fit in?</summary>
+
+Instantiate → populate properties → Aware callbacks → `BeanPostProcessor.postProcessBeforeInitialization`
+→ `@PostConstruct`/`afterPropertiesSet` → `BeanPostProcessor.postProcessAfterInitialization` → bean
+ready → `@PreDestroy` on context close (singletons only). `BeanPostProcessor`s are the extension
+point behind AOP proxy creation and `@Autowired`/`@Value` injection.
+
+</details>
+
+<details id="circular-dependency-resolution">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does Spring resolve a circular dependency between two singleton beans using field injection, and why does the same circular dependency fail at startup with constructor injection?</summary>
+
+With field/setter injection, Spring exposes an early, not-fully-initialized reference of the first
+bean (via a three-level cache) so the second bean can be constructed, then finishes the first
+bean's property population. Constructor injection needs the *fully constructed* dependency
+up front — there's no early reference a constructor argument can hold — so it fails fast with
+`BeanCurrentlyInCreationException`, which is treated as a feature surfacing a real design problem.
+
+</details>
+
+<details id="qualifier-vs-primary">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@Qualifier` and `@Primary` when multiple beans satisfy the same injection point?</summary>
+
+`@Primary` marks one candidate as the default used whenever a specific bean isn't requested.
+`@Qualifier` overrides that default at a specific injection point by name. With neither present
+and multiple candidates available, startup fails with `NoUniqueBeanDefinitionException`.
+
+</details>
+
+Full explanation → [IoC & Dependency Injection](../spring-boot/02-ioc-and-dependency-injection.md)
+
+## Auto-Configuration & Starters (6 questions)
+
+<details id="spring-boot-application-composition">
+<summary><span className="qb-badge qb-badge--core">Core</span>What three annotations does `@SpringBootApplication` compose, and what does each one actually do?</summary>
+
+`@SpringBootConfiguration` (marks it as a `@Configuration` bean-definition source),
+`@ComponentScan` (scans the main class's package and sub-packages for stereotyped beans), and
+`@EnableAutoConfiguration` (triggers conditional auto-configuration based on the classpath).
+
+</details>
+
+<details id="how-auto-configuration-decides">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does Spring Boot decide which auto-configuration classes to apply at startup?</summary>
+
+It loads candidate `@AutoConfiguration` classes listed in
+`AutoConfiguration.imports`, then evaluates each one's `@Conditional*` annotations
+(`@ConditionalOnClass`, `@ConditionalOnMissingBean`, `@ConditionalOnProperty`, etc.) — only classes
+whose conditions pass actually contribute beans to the context.
+
+</details>
+
+<details id="what-is-a-starter">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a Spring Boot "starter," and what's actually inside one?</summary>
+
+A starter has no code of its own — it's a dependency descriptor that pulls in a curated,
+compatible set of libraries plus the matching autoconfigure module. Adding
+`spring-boot-starter-web` puts Spring MVC, embedded Tomcat, and Jackson on the classpath, which is
+what makes the relevant `@ConditionalOnClass` checks pass.
+
+</details>
+
+<details id="overriding-auto-configured-beans">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>If you define your own `DataSource` bean, why doesn't it clash with the one Spring Boot's auto-configuration would otherwise create?</summary>
+
+`DataSourceAutoConfiguration`'s bean method is guarded by `@ConditionalOnMissingBean(DataSource.class)`.
+Since your own `DataSource` bean is registered first, the condition fails and auto-configuration
+silently backs off instead of producing a duplicate/conflicting bean.
+
+</details>
+
+<details id="conditional-on-missing-bean">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@ConditionalOnBean` and `@ConditionalOnMissingBean`, and why is the latter central to how auto-configuration avoids conflicts?</summary>
+
+`@ConditionalOnBean` applies only if a bean of a given type already exists; `@ConditionalOnMissingBean`
+applies only if it doesn't. Auto-configuration classes almost universally guard their bean methods
+with `@ConditionalOnMissingBean`, which is exactly what lets a user-defined bean transparently
+override the framework default instead of colliding with it.
+
+</details>
+
+<details id="custom-starter-mechanics">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How would you build a custom internal auto-configuration starter, and how does Spring Boot discover it at startup?</summary>
+
+Write an `@AutoConfiguration` class guarded by the appropriate conditionals, then list its fully
+qualified name in
+`META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`. Spring Boot's
+`@EnableAutoConfiguration` mechanism reads that file from every jar on the classpath at startup and
+evaluates each listed class's conditions.
+
+</details>
+
+Full explanation → [Auto-Configuration & Starters](../spring-boot/03-auto-configuration-and-starters.md)
+
+## Spring MVC & REST (6 questions)
+
+<details id="dispatcherservlet-request-flow">
+<summary><span className="qb-badge qb-badge--core">Core</span>Walk through what `DispatcherServlet` does with an incoming HTTP request, from routing to response conversion.</summary>
+
+`DispatcherServlet` is the front controller: a `HandlerMapping` finds the matching controller
+method, argument resolvers populate its parameters (deserializing `@RequestBody` via an
+`HttpMessageConverter`), the method runs, and the return value is converted back to the response
+body by the same converter mechanism in reverse.
+
+</details>
+
+<details id="controller-vs-restcontroller">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@Controller` and `@RestController`?</summary>
+
+`@RestController` is `@Controller` combined with `@ResponseBody`: every method's return value is
+written directly to the response body via an `HttpMessageConverter`, instead of being resolved as
+a view name to render a template.
+
+</details>
+
+<details id="pathvariable-vs-requestparam-vs-requestbody">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@PathVariable`, `@RequestParam`, and `@RequestBody`?</summary>
+
+`@PathVariable` binds a URI template segment (e.g. `/orders/{id}`); `@RequestParam` binds a query
+string parameter; `@RequestBody` deserializes the entire request body via the negotiated message
+converter (typically Jackson for JSON).
+
+</details>
+
+<details id="valid-request-body-validation">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does `@Valid` on a `@RequestBody` parameter interact with Bean Validation, and what happens on a validation failure?</summary>
+
+`@Valid` triggers Hibernate Validator against the deserialized object before the controller method
+body runs. A constraint failure throws `MethodArgumentNotValidException`, which never reaches the
+controller — by default it produces a `400 Bad Request` with a structured list of failed fields.
+
+</details>
+
+<details id="restcontrolleradvice-exception-resolution">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does `@RestControllerAdvice` with `@ExceptionHandler` centralize error handling, and how is the right handler chosen when multiple could match a thrown exception?</summary>
+
+`@RestControllerAdvice` applies globally across all controllers without per-controller try/catch.
+When multiple `@ExceptionHandler` methods could match a thrown exception's type hierarchy, the
+*most specific* matching type wins, regardless of declaration order in the class.
+
+</details>
+
+<details id="content-negotiation">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How does Spring MVC decide which representation (JSON, XML, ...) to return for a given request?</summary>
+
+It negotiates based on the `Accept` header against the registered `HttpMessageConverter`s (JSON via
+Jackson by default). Requesting a media type with no registered converter able to produce it
+returns `406 Not Acceptable` — adding a format like XML is just a classpath addition, no controller
+changes needed.
+
+</details>
+
+Full explanation → [Spring MVC & REST](../spring-boot/04-spring-mvc-and-rest.md)
+
+## Spring Data JPA & Transactions (6 questions)
+
+<details id="spring-data-repository-proxy">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does Spring Data JPA implement a repository interface at runtime when you never write a class body for it?</summary>
+
+A `RepositoryFactoryBean` generates a JDK dynamic proxy implementation at startup. Method names are
+parsed into queries (e.g. `findByCustomerIdAndStatus` → a `WHERE` clause), or you drop to explicit
+JPQL/native SQL with `@Query` for anything the derivation can't express cleanly.
+
+</details>
+
+<details id="transactional-self-invocation">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does calling a `@Transactional` method via `this.method()` from inside the same bean silently skip the transaction?</summary>
+
+`@Transactional` is implemented as an AOP proxy wrapping the bean; the proxy only intercepts calls
+coming from outside, through the proxy reference. `this.method()` is a plain Java call that never
+touches the proxy, so no transaction is opened — the fix is to call through a separate bean.
+
+</details>
+
+<details id="propagation-required-vs-requires-new">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `REQUIRED` and `REQUIRES_NEW` propagation, and when would you reach for `REQUIRES_NEW`?</summary>
+
+`REQUIRED` (default) joins an existing transaction or starts one if none is active. `REQUIRES_NEW`
+always starts an independent transaction, suspending any existing one — useful for something that
+must persist regardless of the outer transaction's outcome, like an audit log entry.
+
+</details>
+
+<details id="n-plus-one-query-problem">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the N+1 query problem, and what are the standard ways to fix it in Spring Data JPA?</summary>
+
+Fetching N parent entities and then lazily accessing each one's association triggers 1 query for
+the parents plus N more, one per association access. Fixes: a JPQL fetch join, `@EntityGraph`, or
+batch fetching (`@BatchSize`) to collapse the N queries into a handful of `IN (...)` queries.
+
+</details>
+
+<details id="lazy-vs-eager-fetching">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `FetchType.LAZY` and `FetchType.EAGER`, and what causes a `LazyInitializationException`?</summary>
+
+`LAZY` (default for `@OneToMany`/`@ManyToMany`) defers loading an association until accessed;
+`EAGER` (default for `@ManyToOne`/`@OneToOne`) loads it immediately. Accessing a lazy association
+after the persistence context has closed — e.g. after a `@Transactional` method has returned —
+throws `LazyInitializationException`.
+
+</details>
+
+<details id="default-rollback-behavior">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>By default, does `@Transactional` roll back on a checked exception? Why or why not?</summary>
+
+No — by default it only rolls back on unchecked exceptions (`RuntimeException`/`Error`). A checked
+exception commits the transaction unless you explicitly add `rollbackFor = Exception.class`, which
+is a common source of silent data-consistency bugs when a checked exception is thrown mid-transaction.
+
+</details>
+
+Full explanation → [Spring Data JPA & Transactions](../spring-boot/05-spring-data-jpa-and-transactions.md)
+
+## AOP & Proxies (6 questions)
+
+<details id="aop-core-concepts">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does Aspect-Oriented Programming solve, and what's the difference between an aspect, advice, and a pointcut?</summary>
+
+AOP lets cross-cutting concerns (logging, transactions, security) be defined once instead of
+duplicated across unrelated methods. An aspect is the module containing the behavior; advice is
+the actual code that runs; a pointcut is the expression declaring *where* (which methods) it applies.
+
+</details>
+
+<details id="around-advice-vs-others">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@Around` advice and the other advice types (`@Before`, `@After`, `@AfterReturning`, `@AfterThrowing`)?</summary>
+
+`@Before`/`@After`/`@AfterReturning`/`@AfterThrowing` run at a fixed point relative to the target
+method and can't change whether it executes. `@Around` wraps the call entirely and must explicitly
+call `proceed()`, giving it full control — it can skip the call, call it multiple times, or modify
+arguments/return value, which is how `@Transactional` and `@Cacheable` are implemented.
+
+</details>
+
+<details id="spring-aop-proxy-mechanism">
+<summary><span className="qb-badge qb-badge--core">Core</span>Does Spring AOP weave advice into bytecode like full AspectJ? How does it actually apply advice to a bean?</summary>
+
+No — Spring AOP works purely through runtime proxies, not compile-/load-time bytecode weaving. The
+container hands callers a proxy instead of the real bean; the proxy runs the advice, then delegates
+to the real object.
+
+</details>
+
+<details id="jdk-proxy-vs-cglib">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a JDK dynamic proxy and a CGLIB proxy, and when does Spring choose one over the other?</summary>
+
+A JDK dynamic proxy implements the target's interface(s) and delegates through an
+`InvocationHandler` — used when the target implements at least one interface. CGLIB generates a
+runtime subclass overriding the target's methods — used when there's no interface, or when
+`proxyTargetClass=true` is forced (the Spring Boot default).
+
+</details>
+
+<details id="cglib-final-limitation">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why can't CGLIB proxy a `final` class or a `final` method?</summary>
+
+CGLIB proxies by generating a runtime subclass that overrides the target's methods. A `final`
+class can't be subclassed and a `final` method can't be overridden, so there's nothing for CGLIB to
+hook into — advice on a `final` target is silently skipped or fails, depending on configuration.
+
+</details>
+
+<details id="proxy-self-invocation-root-cause">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does calling an `@Cacheable` or `@Transactional` method from another method in the same class not trigger the advice?</summary>
+
+Because the proxy sits *around* the bean, not inside it. Any call originating from inside the bean
+via `this.method()` goes straight to the real object and never passes through the proxy, so none of
+the advice — caching, transactions, retries — runs.
+
+</details>
+
+Full explanation → [AOP & Proxies](../spring-boot/06-aop-and-proxies.md)
+
+## Spring Security (6 questions)
+
+<details id="security-filter-chain-position">
+<summary><span className="qb-badge qb-badge--core">Core</span>Where does Spring Security sit relative to `DispatcherServlet`, and what's the general shape of its filter chain?</summary>
+
+Spring Security runs entirely at the servlet `Filter` layer, in front of `DispatcherServlet` —
+not inside Spring MVC. A chain of filters establishes/restores the security context, performs
+authentication, translates security exceptions into the right HTTP status, and finally authorizes
+the request before it ever reaches the dispatcher.
+
+</details>
+
+<details id="authentication-vs-authorization">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between authentication and authorization, and why does that map to 401 vs. 403 responses?</summary>
+
+Authentication answers "who are you?" (verifying credentials); authorization answers "what are you
+allowed to do?" (checking a *known* principal's permissions). Missing/invalid credentials fail
+authentication and return 401; a valid but insufficiently-privileged principal fails authorization
+and returns 403.
+
+</details>
+
+<details id="csrf-stateless-apis">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is CSRF protection typically disabled for stateless, token-based REST APIs but left enabled for session/cookie-based web apps?</summary>
+
+CSRF exploits an *ambient* credential — a browser automatically attaching a session cookie to a
+forged cross-site request. Bearer tokens sent explicitly in an `Authorization` header aren't
+ambient; the attacker's page has no way to read and attach the victim's token, so there's nothing
+for CSRF protection to defend against.
+
+</details>
+
+<details id="jwt-stateless-authentication">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does stateless JWT authentication work in Spring Security, and what does `SessionCreationPolicy.STATELESS` actually change?</summary>
+
+A custom filter validates the JWT's signature/expiry on each request and populates the
+`SecurityContext` for that request only. `STATELESS` tells Spring Security to never create or read
+an `HttpSession`, so every request must independently prove its identity — trading server-managed
+sessions for horizontal scalability.
+
+</details>
+
+<details id="preauthorize-method-security">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does `@PreAuthorize` give you that URL-pattern-based `authorizeHttpRequests` rules can't express?</summary>
+
+`@PreAuthorize` is evaluated with Spring Expression Language and has access to method arguments, so
+it can enforce data-dependent rules (e.g. "only the order's own customer or an admin") that a
+purely URL-pattern-based rule has no way to express.
+
+</details>
+
+<details id="securityfilterchain-bean-migration">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why was `WebSecurityConfigurerAdapter` deprecated, and what replaced it?</summary>
+
+It forced a single, inheritance-based configuration class, making it awkward to compose multiple
+independent security configurations. Since Spring Security 5.7, configuration is done by exposing
+one or more `SecurityFilterChain` beans (matched by request pattern) via a lambda-based DSL instead.
+
+</details>
+
+Full explanation → [Spring Security](../spring-boot/07-spring-security.md)
+
+## Testing (6 questions)
+
+<details id="test-slice-annotations">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@WebMvcTest`, `@DataJpaTest`, and `@SpringBootTest`, and how would you choose between them?</summary>
+
+`@WebMvcTest` loads only the web layer (controllers, filters, advice); `@DataJpaTest` loads only
+the JPA layer with a test database; `@SpringBootTest` loads the full application context. Pick the
+narrowest slice that exercises what's actually under test — `@SpringBootTest` is reserved for true
+end-to-end scenarios because it pays the full context-startup cost.
+
+</details>
+
+<details id="webmvctest-mockbean-requirement">
+<summary><span className="qb-badge qb-badge--core">Core</span>When using `@WebMvcTest`, why do you need `@MockBean` for the controller's service dependency?</summary>
+
+`@WebMvcTest` explicitly loads only MVC infrastructure — `@Service`/`@Repository` beans are not
+part of that slice. Any dependency the controller needs must be supplied as a Mockito mock via
+`@MockBean` so the context can wire the controller at all.
+
+</details>
+
+<details id="mockmvc-vs-mockbean">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between `MockMvc` and `@MockBean` — what problem does each one actually solve?</summary>
+
+`MockMvc` simulates the servlet request/response cycle by driving `DispatcherServlet` directly,
+without starting a real HTTP server. `@MockBean` replaces a specific bean inside the Spring context
+with a mock, independent of how requests are simulated — the two are frequently confused but solve
+unrelated problems.
+
+</details>
+
+<details id="datajpatest-defaults">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does `@DataJpaTest` set up for you by default, and how do you keep it from swapping in an in-memory database?</summary>
+
+By default it configures an embedded/in-memory test database, scans entities and repositories, and
+wraps each test in a transaction that rolls back afterward. Use
+`@AutoConfigureTestDatabase(replace = Replace.NONE)` to keep your configured (e.g. Testcontainers)
+database instead.
+
+</details>
+
+<details id="testcontainers-vs-h2">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why would you reach for Testcontainers instead of an in-memory H2 database in an integration test?</summary>
+
+H2 is fast but doesn't match production databases exactly — different SQL dialect quirks,
+constraint behavior, and locking semantics can hide real bugs. Testcontainers runs the actual
+database engine in a throwaway Docker container, giving production-equivalent behavior at the cost
+of requiring Docker in CI.
+
+</details>
+
+<details id="overusing-springboottest">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why shouldn't every test in a large Spring Boot codebase just use `@SpringBootTest`?</summary>
+
+Each `@SpringBootTest` boots the entire application context, and Spring only caches/reuses a
+context across tests when their configuration is identical — a large suite with many slightly
+different `@SpringBootTest` setups can spend most of its time repeatedly booting contexts instead
+of running assertions, making CI far slower than necessary.
+
+</details>
+
+Full explanation → [Testing](../spring-boot/08-testing.md)
+
+## Configuration, Profiles & Actuator (6 questions)
+
+<details id="property-source-precedence">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the precedence order when the same property is set in `application.yml`, a profile-specific file, and an environment variable?</summary>
+
+Roughly, from highest to lowest precedence: command-line arguments, environment variables,
+`application-{profile}.yml`, the base `application.yml`, `@PropertySource` entries, and finally
+defaults hardcoded in `@ConfigurationProperties` classes. This is what lets the same build artifact
+run unmodified across environments, with env vars overriding packaged config.
+
+</details>
+
+<details id="value-vs-configurationproperties">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `@Value` and `@ConfigurationProperties`, and when would you prefer one over the other?</summary>
+
+`@Value` binds a single property at a time with no built-in validation. `@ConfigurationProperties`
+binds a whole related group of properties into one strongly typed, validated object, failing fast
+at startup on a missing/malformed value instead of surfacing a `null` at request time. Prefer it for
+anything beyond a single standalone value.
+
+</details>
+
+<details id="spring-profiles-mechanics">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does a Spring profile actually do, and how would you use `@Profile` to swap a real integration for a stub in tests?</summary>
+
+Activating a profile layers a profile-specific config file on top of the base config and registers
+only the beans whose `@Profile` matches the active profile(s). Declaring a real implementation with
+`@Profile("!test")` and a stub with `@Profile("test")` lets the test profile swap in the stub with
+no code branching.
+
+</details>
+
+<details id="actuator-endpoints-not-exposed-by-default">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why doesn't Spring Boot Actuator expose all its endpoints by default?</summary>
+
+Endpoints like `/actuator/env` or `/actuator/heapdump` can leak secrets or be expensive to compute.
+Only `health` and `info` are exposed by default over HTTP — everything else requires an explicit
+opt-in via `management.endpoints.web.exposure.include`, because exposing everything by default
+would be an unsafe default for a production-facing framework.
+
+</details>
+
+<details id="liveness-vs-readiness-probes">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between Kubernetes liveness and readiness probes, and how does Spring Boot Actuator expose each?</summary>
+
+Liveness asks "is this process unrecoverable and should be restarted?"; readiness asks "can this
+pod currently serve traffic?" `management.endpoint.health.probes.enabled=true` splits
+`/actuator/health` into `/actuator/health/liveness` and `/actuator/health/readiness` to answer each
+question separately.
+
+</details>
+
+<details id="liveness-readiness-misconfiguration-incident">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What goes wrong if a temporary downstream outage is wired into your liveness probe instead of your readiness probe?</summary>
+
+A failing liveness probe makes Kubernetes restart the pod; a failing readiness probe just stops
+routing traffic to it. If a transient downstream outage trips the liveness probe, Kubernetes will
+repeatedly kill and restart perfectly healthy pods that are simply waiting on the dependency to
+recover — often making the outage worse instead of containing it.
+
+</details>
+
+Full explanation → [Configuration, Profiles & Actuator](../spring-boot/09-configuration-and-actuator.md)

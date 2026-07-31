@@ -115,6 +115,10 @@ const config = {
                 to: '/docs/question-bank/java-core',
                 label: 'Java Core',
               },
+              {
+                to: '/docs/question-bank/spring-boot',
+                label: 'Spring Boot',
+              },
             ],
           },
           {
@@ -145,6 +149,14 @@ const config = {
               {
                 label: 'Java Core Question Bank',
                 to: '/docs/question-bank/java-core',
+              },
+              {
+                label: 'Spring Boot',
+                to: '/docs/spring-boot/spring-and-spring-boot-fundamentals',
+              },
+              {
+                label: 'Spring Boot Question Bank',
+                to: '/docs/question-bank/spring-boot',
               },
             ],
           },
