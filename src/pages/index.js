@@ -8,25 +8,6 @@ import HomepageTopics from '@site/src/components/HomepageTopics';
 import {totalQuestions} from '@site/src/data/topics';
 import styles from './index.module.css';
 
-const stats = [
-  {value: String(totalQuestions), label: 'Questions'},
-  {value: '6', label: 'Topics'},
-  {value: '110', label: 'Pages'},
-];
-
-function HomepageStats() {
-  return (
-    <div className={styles.statsRow}>
-      {stats.map((stat) => (
-        <div key={stat.label} className={styles.statTile}>
-          <div className={styles.statValue}>{stat.value}</div>
-          <div className={styles.statLabel}>{stat.label}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
@@ -66,7 +47,6 @@ export default function Home() {
       title={siteConfig.title}
       description="A living, topic-by-topic reference for backend engineering interviews: Kafka, databases, distributed systems, API design, and more.">
       <HomepageHeader />
-      <HomepageStats />
       <main>
         <section className={styles.aboutSection}>
           <div className="container">

@@ -78,40 +78,6 @@
   color: var(--ifm-color-emphasis-700);
 }
 
-.statsRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3rem;
-  flex-wrap: wrap;
-  padding: 0 1rem 2.5rem;
-}
-
-.statTile {
-  text-align: center;
-}
-
-.statValue {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: var(--ifm-color-primary);
-  line-height: 1;
-}
-
-.statLabel {
-  margin-top: 0.35rem;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ifm-color-emphasis-600);
-}
-
-@media screen and (max-width: 996px) {
-  .statsRow {
-    gap: 2rem;
-  }
-}
-
 @media screen and (max-width: 600px) {
   .journeyGrid {
     grid-template-columns: 1fr;
