@@ -100,6 +100,16 @@ export default function Home() {
                     injection and enterprise patterns, concurrency patterns,
                     and anti-patterns/pattern selection.
                   </li>
+                  <li>
+                    <Link to="/docs/microservices/microservices-fundamentals">
+                      Microservices
+                    </Link>{' '}
+                    &mdash; microservices fundamentals, service communication,
+                    API gateways and service discovery, data management and
+                    distributed transactions, resilience patterns,
+                    observability, deployment and orchestration, security, and
+                    anti-patterns/trade-offs.
+                  </li>
                 </ul>
                 <p>
                   More topics (PostgreSQL, Redis, distributed systems, API

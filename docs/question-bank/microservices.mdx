@@ -1,0 +1,613 @@
+---
+title: Microservices
+sidebar_label: Microservices
+---
+
+import ExpandCollapseAll from '@site/src/components/ExpandCollapseAll';
+import Flashcards from '@site/src/components/Flashcards';
+
+# Microservices
+
+Every Microservices question on this site, grouped by subtopic — 59 questions across 9 sections.
+Click a question to reveal its answer &mdash; try answering it yourself first, then check. Each
+section ends with a link to the topic's full explanation in `docs/microservices` if you need the
+deeper "why," diagrams, or code.
+
+<ExpandCollapseAll />
+<Flashcards />
+
+## Microservices Fundamentals (7 questions)
+
+<details id="what-is-a-microservice">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a microservice, and what makes it different from just "a service"?</summary>
+
+A microservice is a small, independently deployable service that owns a single business capability
+end-to-end — its own code, its own data, and its own release lifecycle — and communicates with
+other services over the network. "Small" means small in scope (ownable by one team, changeable
+without coordinating with others), not small in lines of code.
+
+</details>
+
+<details id="monolith-vs-microservices-vs-soa">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a monolith, microservices, and SOA?</summary>
+
+A monolith is a single deployable unit where components talk via in-process calls and usually
+share one database. Microservices are many small, independently deployable services, each owning
+its own data, communicating over the network. SOA is the broader, older style microservices grew
+out of, classically relying on a centralized Enterprise Service Bus for routing/orchestration,
+with typically larger, more coarse-grained services than microservices use.
+
+</details>
+
+<details id="service-vs-module">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a service and a module/component?</summary>
+
+A module (or component) is a unit of code organization within a single deployable — separated at
+compile time, still running in the same process. A service is a unit of runtime and deployment
+separation — it runs in its own process, is deployed independently, and is reached over the
+network rather than a function call.
+
+</details>
+
+<details id="modular-monolith">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What is a modular monolith, and why might a team choose it over microservices?</summary>
+
+A monolith with clean module boundaries and no cross-module database access. It gets much of the
+maintainability benefit of service boundaries without the distributed-systems tax (network
+latency, partial failure, distributed data), making it a reasonable middle ground for teams that
+adopted microservices too early would have been better served by first.
+
+</details>
+
+<details id="bounded-context">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a bounded context, and why does it matter for drawing service boundaries?</summary>
+
+A bounded context is an explicit boundary within which a domain model and its terminology are
+consistent — the same word can mean different things in different contexts. The rule of thumb is
+one microservice should map to at most one bounded context; splitting a context across services
+tends to produce chatty, tightly-coupled services.
+
+</details>
+
+<details id="when-microservices">
+<summary><span className="qb-badge qb-badge--core">Core</span>When should a team choose microservices over a monolith, and when shouldn't they?</summary>
+
+Worth it when different parts need to scale independently, multiple teams need to ship without
+blocking each other, or parts have genuinely different tech/reliability needs. Usually the wrong
+call when coordination was never the bottleneck, domain boundaries aren't well understood yet, or
+the team lacks the operational maturity to run many independently deployed services.
+
+</details>
+
+<details id="start-with-a-monolith">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is "start with a monolith" often considered good advice even for systems expected to scale?</summary>
+
+Because service boundaries drawn before the domain's real seams are understood tend to be wrong,
+producing chatty or tightly-coupled services. A well-factored monolith is cheaper to run and
+refactor, and services should be extracted only when a specific, measured pain point justifies the
+added operational cost.
+
+</details>
+
+Full explanation → [Microservices Fundamentals](../microservices/01-microservices-fundamentals.md)
+
+## Service Communication (6 questions)
+
+<details id="sync-vs-async">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the core trade-off between synchronous and asynchronous service communication?</summary>
+
+Synchronous calls (REST, gRPC) block the caller until a response arrives — simple to reason about,
+but couples the caller's availability to the callee's and stacks latency across chained calls.
+Asynchronous messaging decouples services in time, improving resilience and throughput, at the
+cost of an immediate response and having to reason about eventual consistency.
+
+</details>
+
+<details id="rest-vs-grpc">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between REST and gRPC, and when would you pick one over the other?</summary>
+
+REST uses human-readable JSON over HTTP with a loose contract and is browser-friendly; gRPC uses
+binary Protobuf over HTTP/2 with a strict, code-generated contract and first-class streaming.
+Common pattern: gRPC between internal services for performance, REST/JSON at the edge for browsers
+and external clients.
+
+</details>
+
+<details id="message-queue-vs-event-stream">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a message queue and an event stream like Kafka?</summary>
+
+A message queue (RabbitMQ, SQS) typically has a message consumed and removed by one consumer — good
+for task distribution. An event stream (Kafka) appends events to a durable, ordered, replayable log
+that multiple independent consumer groups can each read at their own pace — good for broadcasting
+facts to many interested services.
+
+</details>
+
+<details id="orchestration-vs-choreography">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between orchestration and choreography for multi-service workflows?</summary>
+
+Orchestration has a central coordinator explicitly calling each service and directing the flow —
+easy to follow, but the coordinator is a central dependency. Choreography has no coordinator; each
+service reacts to others' events and publishes its own — no single point of coordination, but the
+overall flow is implicit across every participant.
+
+</details>
+
+<details id="sync-chain-latency">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why do calling several services synchronously in sequence hurt latency and reliability?</summary>
+
+Each synchronous call in the chain adds its own latency on top of the others, so total latency
+stacks, and the overall call is only as available as the least available service in the chain — one
+slow or down dependency anywhere in the sequence slows or breaks the whole request.
+
+</details>
+
+<details id="mixing-sync-and-async">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why do most real systems use both synchronous and asynchronous communication rather than picking just one?</summary>
+
+Synchronous calls fit interactions where the caller genuinely needs an answer to proceed (e.g. "is
+this payment authorized?"). Asynchronous messaging fits anything that's really a fact being
+broadcast that other services should react to on their own time — most systems have both kinds of
+interaction.
+
+</details>
+
+Full explanation → [Service Communication](../microservices/02-service-communication.md)
+
+## API Gateway & Service Discovery (7 questions)
+
+<details id="what-is-an-api-gateway">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is an API gateway, and what does it do besides routing requests?</summary>
+
+A single entry point that mediates every external request into a system. Beyond routing, it
+commonly handles authentication/authorization, rate limiting, request/response transformation,
+response aggregation, and cross-cutting observability, so individual services don't each
+reimplement those concerns.
+
+</details>
+
+<details id="api-gateway-vs-load-balancer">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between an API gateway and a load balancer?</summary>
+
+A load balancer distributes traffic across instances of the same service using network/HTTP-level
+rules. An API gateway operates a layer up — application-level routing across different services,
+plus auth, rate limiting, and transformation. A gateway typically sits in front of, and works with,
+per-service load balancing.
+
+</details>
+
+<details id="what-is-service-discovery">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is service discovery, and why can't a service just hardcode another service's address?</summary>
+
+Service discovery is how a caller finds a current, healthy instance of a service by name. Instance
+addresses aren't stable — containers/pods are rescheduled, scaled, and given new IPs constantly —
+so a caller queries a registry (directly or via an intermediary) instead of hardcoding an address.
+
+</details>
+
+<details id="client-side-vs-server-side-discovery">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between client-side and server-side service discovery?</summary>
+
+Client-side: the caller queries the registry directly and picks an instance itself — fewer hops,
+but every client needs discovery/load-balancing logic. Server-side: the caller sends requests to a
+fixed address (a load balancer or gateway) that consults the registry and forwards — simpler
+clients, but an extra, highly-available hop is needed.
+
+</details>
+
+<details id="service-registry-and-health-checks">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a service registry, and why do health checks matter for keeping it accurate?</summary>
+
+The database of which instances of which services are currently healthy and where. Instances
+register on startup and are removed by deregistering on shutdown or failing periodic health
+checks; without active health checking, the registry drifts out of sync and callers get routed to
+dead instances.
+
+</details>
+
+<details id="kubernetes-built-in-discovery">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why might a team running on Kubernetes not need a separate service discovery tool like Eureka or Consul?</summary>
+
+Kubernetes Services already provide server-side discovery largely for free — a stable DNS name per
+deployment, internally load-balanced across whichever pod IPs are currently healthy — so many teams
+get discovery from the platform without standing up a separate registry.
+
+</details>
+
+<details id="backend-for-frontend">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What is a Backend for Frontend (BFF), and why would a team introduce one alongside an API gateway?</summary>
+
+A dedicated aggregation/transformation layer built for a specific client type (e.g. mobile vs. web),
+split out from a general-purpose gateway when different client types need meaningfully different
+aggregated response shapes that a single shared gateway can't cleanly serve.
+
+</details>
+
+Full explanation → [API Gateway & Service Discovery](../microservices/03-api-gateway-and-service-discovery.md)
+
+## Data Management & Distributed Transactions (7 questions)
+
+<details id="database-per-service">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does "database-per-service" mean, and why is it the default rule in microservices?</summary>
+
+Each service owns its own database, and no other service touches it directly — all access goes
+through that service's API. This is what makes services independently deployable: a shared
+database would let one service's schema change silently break another, re-coupling them at the
+data layer.
+
+</details>
+
+<details id="two-phase-commit">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is two-phase commit, and why is it rarely used across microservices in practice?</summary>
+
+A coordinator asks every participant to prepare (lock resources) in phase one, and only commits in
+phase two if all vote yes. It's rarely used because it's blocking (a slow participant stalls
+everyone, holding locks the whole time), requires a shared protocol across all participants, and
+trades away availability for consistency.
+
+</details>
+
+<details id="saga-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Saga pattern, and how does it avoid needing a distributed transaction?</summary>
+
+A sequence of local transactions, one per service, each publishing an event that triggers the next
+step. There's no cross-service lock or single atomic commit; if a later step fails, compensating
+transactions semantically undo the effects of steps that already succeeded.
+
+</details>
+
+<details id="saga-orchestration-vs-choreography">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between an orchestration-based and a choreography-based Saga?</summary>
+
+Orchestration-based: a central saga orchestrator explicitly calls each service and issues
+compensating calls on failure — easier to follow, but a central dependency. Choreography-based:
+each service publishes and reacts to events with no central coordinator — no single point of
+failure, but the overall flow is implicit across participants.
+
+</details>
+
+<details id="compensating-transaction">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a compensating transaction, and how is it different from a database rollback?</summary>
+
+A compensating transaction semantically undoes a step that was already truly committed in another
+service (e.g. issuing a refund), rather than rolling back an uncommitted local transaction. It's
+needed because a Saga's earlier steps are real, independent commits — there's nothing to roll back
+across services.
+
+</details>
+
+<details id="outbox-pattern-microservices">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does the transactional outbox pattern solve?</summary>
+
+It solves atomically updating a service's own database and publishing an event about that change —
+two separate operations that could otherwise lose or duplicate the event on a crash. The event is
+written to an outbox table in the same local transaction as the business change, then reliably
+published by a separate process.
+
+</details>
+
+<details id="querying-across-services">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How would you query data that spans two services when you can't JOIN across their databases?</summary>
+
+Either API composition (call each owning service and join in application code — simple but can be
+slow) or CQRS with a denormalized read model built ahead of time from events consumed via the
+outbox pattern (fast reads, but only eventually consistent with the source data).
+
+</details>
+
+Full explanation → [Data Management & Distributed Transactions](../microservices/04-data-management-and-transactions.md)
+
+## Resilience Patterns (7 questions)
+
+<details id="cascading-failure">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is cascading failure, and why does a healthy service become unresponsive when a dependency it calls fails?</summary>
+
+When a called service is slow or down, requests waiting on it pile up and consume the caller's own
+threads/connections until the caller itself becomes unresponsive to its own callers, even though it
+was healthy. This is how one struggling dependency can take down an entire call graph.
+
+</details>
+
+<details id="why-timeouts-matter">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is a timeout on every downstream call considered a baseline requirement, not an optimization?</summary>
+
+Without a timeout, a hung downstream call ties up the caller's resources indefinitely — often worse
+than an outright error, since a fast, clear failure is far easier to handle than an indefinite
+hang, and is a direct contributor to cascading failure.
+
+</details>
+
+<details id="retry-storm">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a retry storm, and how do exponential backoff and jitter prevent it?</summary>
+
+A retry storm is many callers instantly retrying a struggling dependency, adding load exactly when
+it's least able to handle it. Exponential backoff waits progressively longer between attempts, and
+jitter randomizes the wait so many callers don't retry in lockstep, spreading out the added load.
+
+</details>
+
+<details id="circuit-breaker-states">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the three states of a circuit breaker, and what does each one do?</summary>
+
+Closed: calls go through normally, failures are counted. Open: once failures cross a threshold,
+calls fail immediately without attempting the network call, for a cooldown period. Half-open: after
+cooldown, a limited number of trial calls decide whether to close again or reopen.
+
+</details>
+
+<details id="retry-vs-circuit-breaker">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between what retry solves and what a circuit breaker solves?</summary>
+
+Retry handles brief, isolated blips by re-attempting a call. A circuit breaker handles a dependency
+that's sustained-failing, stopping the caller from wasting resources and adding load on a lost
+cause until the dependency has a chance to recover — they're complementary, not competing.
+
+</details>
+
+<details id="bulkhead-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the bulkhead pattern, and what failure mode does it specifically prevent?</summary>
+
+Isolating resources (thread/connection pools) per dependency, so one overwhelmed dependency can
+only exhaust the resources allocated to calls against it. Without it, a single slow dependency can
+starve a shared resource pool and take down calls to completely unrelated, healthy dependencies.
+
+</details>
+
+<details id="retry-idempotency">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why should retries only be applied to idempotent operations?</summary>
+
+Retrying a non-idempotent operation (like "charge this payment") blindly can repeat its side effect
+— e.g. double-charging a customer — because the original call may have actually succeeded and only
+the response was lost.
+
+</details>
+
+Full explanation → [Resilience Patterns](../microservices/05-resilience-patterns.md)
+
+## Observability (7 questions)
+
+<details id="logs-metrics-traces">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the three pillars of observability, and what does each one tell you that the others don't?</summary>
+
+Logs are detailed, discrete events from a single service. Metrics are numeric measurements
+aggregated over time, cheap for dashboards/alerting — they tell you something is wrong and roughly
+where. Traces follow a single request across every service it touches, narrowing down exactly
+where time was spent or it failed.
+
+</details>
+
+<details id="distributed-trace-and-spans">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a distributed trace, and what is a span within one?</summary>
+
+A distributed trace represents one end-to-end request as a tree of spans. A span is a single unit
+of work with a start time, duration, and metadata; every span shares the same trace ID and (except
+the first) carries its parent span's ID, letting tools reconstruct the full call tree.
+
+</details>
+
+<details id="context-propagation">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does context propagation let a trace be reconstructed across multiple services?</summary>
+
+Each service includes the trace ID and its own span ID (as the parent) in outgoing request headers;
+the receiving service reads those headers, starts a child span, and propagates the same trace ID
+onward. If any service drops the headers, the trace breaks into disconnected fragments.
+
+</details>
+
+<details id="correlation-id">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a correlation ID, and how is it different from a full distributed trace?</summary>
+
+A single identifier generated at the edge and passed through every downstream call and log line for
+a request. It doesn't give span-level timing like a full trace, but lets you grep centralized logs
+across every service for one ID — often faster to set up than full tracing infrastructure.
+
+</details>
+
+<details id="centralized-logging">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why does centralized logging matter more in microservices than in a monolith?</summary>
+
+Each service instance has its own local logs, and instances are constantly created and destroyed by
+the orchestrator — by the time someone wants to debug an issue, the specific instance that logged
+it may no longer exist, so logs need to be shipped off and aggregated centrally to be useful.
+
+</details>
+
+<details id="liveness-vs-readiness">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a liveness probe and a readiness probe?</summary>
+
+Liveness asks "is this instance still running correctly, or should it be killed and restarted?" —
+failure triggers a restart. Readiness asks "can this instance currently serve traffic?" — failure
+just removes it from load-balancing/discovery until it passes again, without restarting it.
+
+</details>
+
+<details id="readiness-failure-mistake">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is it a mistake to restart an instance on every readiness check failure?</summary>
+
+Treating a transient, self-recovering readiness failure (like a downstream dependency being briefly
+unavailable) as a reason to restart can trigger restart loops instead of simply pulling the
+instance out of rotation until the transient condition clears on its own.
+
+</details>
+
+Full explanation → [Observability](../microservices/06-observability.md)
+
+## Deployment & Orchestration (6 questions)
+
+<details id="container-vs-vm">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a container and a virtual machine?</summary>
+
+A container packages an app with its dependencies but shares the host's OS kernel — lightweight,
+starts in seconds. A VM virtualizes an entire hardware layer including its own OS kernel — heavier,
+starts in minutes, but offers stronger isolation since it doesn't share a kernel.
+
+</details>
+
+<details id="kubernetes-pod">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a Kubernetes Pod, and why does it sometimes hold more than one container?</summary>
+
+The smallest deployable unit — one or more tightly-coupled containers that always run together on
+the same node, sharing networking/storage. Usually one application container per pod, occasionally
+plus a helper sidecar container (e.g. a service mesh proxy).
+
+</details>
+
+<details id="kubernetes-deployment">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does a Kubernetes Deployment do, and how does its controller loop keep it running?</summary>
+
+It declares how many replicas of a pod should run and manages rolling out new versions. A
+controller loop continuously reconciles actual state toward the declared desired state — if a pod
+crashes or a node dies, it creates a replacement automatically.
+
+</details>
+
+<details id="deployment-strategies">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between rolling, blue-green, and canary deployments?</summary>
+
+Rolling: gradually replace old instances with new, no downtime but both versions briefly coexist.
+Blue-green: stand up a full second environment and switch traffic all at once, instant rollback but
+needs two environments briefly. Canary: roll out to a small traffic slice first, limiting blast
+radius before ramping to 100%.
+
+</details>
+
+<details id="service-mesh-and-sidecar">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a service mesh, and what problem does the sidecar proxy pattern solve?</summary>
+
+A service mesh moves cross-cutting network concerns (mTLS, retries, timeouts, circuit breaking,
+observability) out of application code into infrastructure. A sidecar proxy deployed alongside
+every instance transparently handles that traffic, so application code doesn't need to know the
+mesh exists.
+
+</details>
+
+<details id="when-service-mesh-worth-it">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>When is a service mesh worth the operational cost, and when isn't it?</summary>
+
+It pays off once the number of services and teams that would otherwise each duplicate
+resilience/security/observability logic gets large. Small-to-medium systems can often get similar
+behavior more simply with a shared library and a good API gateway, without the extra proxy hop and
+operational complexity.
+
+</details>
+
+Full explanation → [Deployment & Orchestration](../microservices/07-deployment-and-orchestration.md)
+
+## Security (6 questions)
+
+<details id="auth-beyond-the-edge">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why does authentication in microservices need to be answered at more than just the system's edge?</summary>
+
+A request authenticated at the gateway doesn't automatically prove which internal service-to-service
+calls it should be allowed to trigger — a compromised or misconfigured internal service can still
+cause damage if nothing downstream re-checks identity and authorization.
+
+</details>
+
+<details id="jwt-fits-microservices">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why does JWT's self-contained, locally-verifiable design fit microservices particularly well?</summary>
+
+A JWT's signature can be verified locally by any service, without a network round trip back to an
+auth server for every request. An identity provider issues the token once, and every downstream
+service can independently trust its claims until expiry.
+
+</details>
+
+<details id="jwt-revocation-tradeoff">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the trade-off of a JWT being self-contained when it comes to revoking a compromised token?</summary>
+
+Because it's self-contained, a JWT can't be un-issued before it naturally expires — there's no
+server-side session record to delete. Revoking early requires extra machinery like a blocklist the
+gateway checks, or deliberately short expiries paired with refresh tokens.
+
+</details>
+
+<details id="zero-trust">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does zero-trust mean in a microservices context, and how is it different from auth-at-the-edge-only?</summary>
+
+Zero-trust means every service independently verifies the caller's identity and permissions, even
+for internal calls, rather than assuming internal traffic is trusted because it originated inside
+the network. Auth-at-the-edge-only skips those internal checks, trading defense in depth for
+simplicity.
+
+</details>
+
+<details id="mtls">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is mTLS, and how is it different from ordinary TLS?</summary>
+
+Ordinary TLS has only the server present a certificate the client verifies. Mutual TLS has both
+sides present certificates, so the server also cryptographically verifies which service is calling
+it — commonly provided automatically by a service mesh's sidecar proxies.
+
+</details>
+
+<details id="api-key-vs-mtls">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is an API key generally considered weaker than mTLS for service-to-service authentication?</summary>
+
+An API key is a static shared secret that stays valid until manually rotated and doesn't
+cryptographically prove which service is calling — a leaked key is just as usable by an attacker as
+by the legitimate service, unlike mTLS's per-connection certificate verification.
+
+</details>
+
+Full explanation → [Security](../microservices/08-security.md)
+
+## Anti-Patterns & Trade-offs (6 questions)
+
+<details id="distributed-monolith">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a distributed monolith, and how does it end up with the costs of microservices but not the benefits?</summary>
+
+A system deployed as many separate services but still structurally one tightly-coupled application
+— services share a database or deploy in lockstep due to tightly coupled APIs. It carries all the
+network latency and operational overhead of microservices without independent deployability.
+
+</details>
+
+<details id="chatty-services">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does it mean for services to be "chatty," and why is it effectively an N+1 problem over the network?</summary>
+
+Completing a single logical operation requires many small, sequential network calls between
+services, similar to an N+1 query problem at the database layer. Each call's latency stacks and
+each is a new opportunity for partial failure — usually a sign the services belong in the same
+bounded context.
+
+</details>
+
+<details id="shared-database-anti-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is two services sharing a database considered an anti-pattern even if it's convenient short-term?</summary>
+
+It re-couples services at the data layer: one service's schema migration can silently break another
+service that was never involved in that deployment, defeating the independent-deployability
+database-per-service was meant to provide.
+
+</details>
+
+<details id="strangler-fig-pattern">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Strangler Fig pattern, and why is it usually preferred over a big-bang rewrite?</summary>
+
+New functionality is built as new services behind a routing layer while the old monolith keeps
+serving everything not yet extracted, gradually shifting traffic over. It avoids a big-bang
+rewrite's risk of months of parallel development with no incremental value and a high chance of
+never catching up to the still-changing original system.
+
+</details>
+
+<details id="nanoservices">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What are "nanoservices," and why can splitting services too finely be as harmful as not splitting them at all?</summary>
+
+Services split so finely that each is too small to justify its own operational overhead (pipeline,
+monitoring, on-call surface). A service should map to a real bounded context, not one class or
+table — over-decomposition trades one set of problems for another without a real benefit.
+
+</details>
+
+<details id="when-to-merge-services">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>How should a team decide whether two services that always change together should actually be merged?</summary>
+
+If two services almost always need to change together and are never scaled or deployed
+independently in practice, that's a signal they were split too finely along the wrong boundary and
+should probably be merged back into one.
+
+</details>
+
+Full explanation → [Anti-Patterns & Trade-offs](../microservices/09-anti-patterns-and-trade-offs.md)

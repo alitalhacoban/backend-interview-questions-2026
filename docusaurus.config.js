@@ -123,6 +123,14 @@ const config = {
                 to: '/docs/question-bank/dbms',
                 label: 'DBMS',
               },
+              {
+                to: '/docs/question-bank/design-patterns',
+                label: 'Design Patterns',
+              },
+              {
+                to: '/docs/question-bank/microservices',
+                label: 'Microservices',
+              },
             ],
           },
           {
@@ -169,6 +177,22 @@ const config = {
               {
                 label: 'DBMS Question Bank',
                 to: '/docs/question-bank/dbms',
+              },
+              {
+                label: 'Design Patterns',
+                to: '/docs/design-patterns/design-patterns-fundamentals',
+              },
+              {
+                label: 'Design Patterns Question Bank',
+                to: '/docs/question-bank/design-patterns',
+              },
+              {
+                label: 'Microservices',
+                to: '/docs/microservices/microservices-fundamentals',
+              },
+              {
+                label: 'Microservices Question Bank',
+                to: '/docs/question-bank/microservices',
               },
             ],
           },

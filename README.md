@@ -18,10 +18,23 @@ Live site: `https://alitalhacoban.github.io/backend-interview-questions-2026/`
 - **Java Core** &mdash; OOP fundamentals, the JVM and memory model, the collections framework,
   exception handling, concurrency, generics and type erasure, streams and functional interfaces,
   and string/object contracts.
+- **Spring Boot** &mdash; Spring and Spring Boot fundamentals, IoC and dependency injection,
+  auto-configuration and starters, Spring MVC and REST, Spring Data JPA and transactions, AOP and
+  proxies, Spring Security, testing, configuration/profiles/Actuator, and design patterns as they
+  actually show up in Spring's own APIs.
+- **DBMS** &mdash; relational theory, keys and SQL, normalization, indexing, transactions and
+  ACID, concurrency control and isolation levels, query optimization, storage and recovery, and
+  replication/sharding/NoSQL.
+- **Design Patterns** &mdash; GoF creational, structural, and behavioral patterns, Singleton and
+  thread safety, dependency injection and enterprise patterns, concurrency patterns, and
+  anti-patterns/pattern selection.
+- **Microservices** &mdash; microservices fundamentals, service communication, API gateways and
+  service discovery, data management and distributed transactions, resilience patterns,
+  observability, deployment and orchestration, security, and anti-patterns/trade-offs.
 
-More topics (Spring Boot, PostgreSQL, Redis, distributed systems, API security, and others) will
-be added over time. This is a living project: expect new topics and new questions to show up on
-existing pages as the content grows.
+More topics (PostgreSQL, Redis, distributed systems, API security, and others) will be added over
+time. This is a living project: expect new topics and new questions to show up on existing pages
+as the content grows.
 
 ## Running locally
 
