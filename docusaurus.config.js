@@ -119,6 +119,10 @@ const config = {
                 to: '/docs/question-bank/spring-boot',
                 label: 'Spring Boot',
               },
+              {
+                to: '/docs/question-bank/dbms',
+                label: 'DBMS',
+              },
             ],
           },
           {
@@ -157,6 +161,14 @@ const config = {
               {
                 label: 'Spring Boot Question Bank',
                 to: '/docs/question-bank/spring-boot',
+              },
+              {
+                label: 'DBMS',
+                to: '/docs/dbms/dbms-fundamentals',
+              },
+              {
+                label: 'DBMS Question Bank',
+                to: '/docs/question-bank/dbms',
               },
             ],
           },

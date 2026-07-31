@@ -1,0 +1,8 @@
+{
+  "label": "DBMS",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Relational theory, indexing, transactions, and storage internals for backend engineering interviews."
+  }
+}

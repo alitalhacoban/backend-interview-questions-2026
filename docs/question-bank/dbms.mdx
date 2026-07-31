@@ -1,0 +1,604 @@
+---
+title: DBMS
+sidebar_label: DBMS
+---
+
+import ExpandCollapseAll from '@site/src/components/ExpandCollapseAll';
+import Flashcards from '@site/src/components/Flashcards';
+
+# DBMS
+
+Every DBMS interview question on this site, grouped by subtopic — 59 questions across 9 sections.
+Click a question to reveal its answer &mdash; try answering it yourself first, then check. Each
+section ends with a link to the topic's full explanation in `docs/dbms` if you need the deeper
+"why," diagrams, or code.
+
+<ExpandCollapseAll />
+<Flashcards />
+
+## DBMS Fundamentals (7 questions)
+
+<details id="what-is-a-dbms">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a DBMS, and what does it give you that storing data in flat files doesn't?</summary>
+
+A DBMS is software that sits between applications and stored data, providing controlled, structured
+access to it. Compared to flat files, it adds concurrency control (safe simultaneous access),
+enforced data integrity (constraints), durability (survives crashes), a declarative query language,
+and reduced redundancy through normalization.
+
+</details>
+
+<details id="dbms-vs-rdbms">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the difference between a DBMS and an RDBMS?</summary>
+
+DBMS is the general term for any system managing data. RDBMS is a specific kind of DBMS that
+organizes data into related tables with a fixed schema, enforces relationships via keys, and uses
+SQL — every RDBMS is a DBMS, but not every DBMS is relational (e.g. MongoDB or Redis are DBMSes,
+not RDBMSes).
+
+</details>
+
+<details id="sql-vs-nosql">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between SQL and NoSQL databases, and how would you decide between them?</summary>
+
+SQL databases are relational, schema-first, and ACID by default (PostgreSQL, MySQL). NoSQL is an
+umbrella for schema-flexible systems built for horizontal scale, often trading strict consistency
+for availability. Choose based on how relational the data is, how much the schema will change, and
+whether you need vertical strong consistency or horizontal scale.
+
+</details>
+
+<details id="oltp-vs-olap">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between OLTP and OLAP systems?</summary>
+
+OLTP handles a high volume of short, simple transactions (inserts, point updates) and is optimized
+for fast writes on row-oriented storage. OLAP handles complex, read-heavy analytical queries over
+large historical datasets and is optimized with columnar storage for scanning/aggregating many rows
+across few columns.
+
+</details>
+
+<details id="dbms-data-models">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the main DBMS data models besides relational?</summary>
+
+Document (flexible JSON-like documents, e.g. MongoDB), key-value (simplest, fastest point lookups,
+e.g. Redis), columnar/wide-column (optimized for scanning single columns at scale, e.g. Cassandra),
+and graph (nodes/edges as first-class citizens for relationship traversal, e.g. Neo4j).
+
+</details>
+
+<details id="acid-vs-base">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between the ACID and BASE consistency models?</summary>
+
+ACID (Atomicity, Consistency, Isolation, Durability) is the strict correctness guarantee
+traditional RDBMSes make. BASE (Basically Available, Soft state, Eventual consistency) is the
+looser model many distributed NoSQL systems use instead, favoring availability and scale over
+immediate consistency — reads may be briefly stale but converge over time.
+
+</details>
+
+<details id="oltp-and-olap-together">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why might a production system run both an OLTP database and a separate OLAP warehouse?</summary>
+
+So heavy analytical queries (large scans and aggregations) never compete for resources with the
+live application's transactional traffic. Data is typically synced from the OLTP database into a
+separate OLAP warehouse (e.g. Snowflake, BigQuery, ClickHouse) via ETL or CDC pipelines.
+
+</details>
+
+Full explanation → [DBMS Fundamentals](../dbms/01-dbms-fundamentals.md)
+
+## Relational Model, Keys & SQL (7 questions)
+
+<details id="primary-vs-candidate-vs-super-key">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the difference between a super key, a candidate key, and a primary key?</summary>
+
+A super key is any column set that uniquely identifies a row (can include redundant columns). A
+candidate key is a *minimal* super key — no column can be removed and still be unique. A primary
+key is the one candidate key chosen as the table's official identifier; any unchosen candidate keys
+are called alternate keys.
+
+</details>
+
+<details id="what-is-a-foreign-key">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a foreign key, and what does it actually enforce?</summary>
+
+A column (or columns) in one table referencing another table's primary key. It enforces referential
+integrity: you can't insert a row pointing at a non-existent parent, and deleting a referenced
+parent follows the configured rule (`CASCADE`, `SET NULL`, or `RESTRICT`).
+
+</details>
+
+<details id="what-is-a-composite-key">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a composite key, and when would you use one?</summary>
+
+A primary (or candidate) key made of more than one column, used when no single column is unique on
+its own — e.g. `(order_id, product_id)` as the key of an order-items table, since neither column
+alone is unique across the table.
+
+</details>
+
+<details id="join-types">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between INNER JOIN, LEFT JOIN, and FULL OUTER JOIN?</summary>
+
+INNER JOIN returns only rows matching in both tables. LEFT JOIN returns all rows from the left
+table plus matches from the right (NULL where none exists). FULL OUTER JOIN returns all rows from
+both tables, NULL-filling whichever side has no match.
+
+</details>
+
+<details id="self-join">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a self join, and what's a real use case for one?</summary>
+
+A table joined to itself, used for hierarchical or comparative data within one table — e.g. an
+`employees` table with a `manager_id` column, self-joined to pair each employee with their
+manager's name.
+
+</details>
+
+<details id="cross-join">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between a CROSS JOIN and forgetting a join condition?</summary>
+
+They're the same result — the Cartesian product of both tables, every row paired with every row of
+the other. `CROSS JOIN` makes that intent explicit; a multi-table `FROM` clause with no `WHERE`/`ON`
+condition produces the identical result accidentally, which is almost always a bug.
+
+</details>
+
+<details id="ddl-vs-dml-vs-dcl-vs-tcl">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between DDL, DML, DCL, and TCL commands?</summary>
+
+DDL defines structure (`CREATE`, `ALTER`, `DROP`), DML manipulates data (`SELECT`, `INSERT`,
+`UPDATE`, `DELETE`), DCL manages permissions (`GRANT`, `REVOKE`), and TCL manages transaction
+boundaries (`COMMIT`, `ROLLBACK`, `SAVEPOINT`).
+
+</details>
+
+Full explanation → [Relational Model, Keys & SQL](../dbms/02-relational-model-and-sql.md)
+
+## Normalization & Schema Design (6 questions)
+
+<details id="what-is-a-functional-dependency">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a functional dependency, and why do normal forms revolve around it?</summary>
+
+`A → B` means any two rows with the same value of `A` must have the same value of `B`. Normal
+forms are defined in terms of eliminating specific functional dependencies (partial, transitive)
+that cause redundancy and update anomalies.
+
+</details>
+
+<details id="normalization-anomalies">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the three classic anomalies normalization prevents?</summary>
+
+Update anomaly (the same fact duplicated across rows can go out of sync), insert anomaly (can't
+record an entity until it's attached to some other row), and delete anomaly (deleting one row
+accidentally destroys unrelated information that happened to live in it).
+
+</details>
+
+<details id="1nf-vs-2nf-vs-3nf">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between 1NF, 2NF, and 3NF?</summary>
+
+1NF requires every column to hold a single atomic value. 2NF adds that every non-key column must
+depend on the *whole* primary key, not part of it (relevant with composite keys). 3NF adds that no
+non-key column may depend on another non-key column (no transitive dependency).
+
+</details>
+
+<details id="bcnf-vs-3nf">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's the difference between BCNF and 3NF?</summary>
+
+3NF has a narrow edge case: a table can satisfy it and still have redundancy when it has multiple
+overlapping candidate keys. BCNF closes that gap with a stricter rule — every determinant (left
+side of a functional dependency) must be a candidate key. Most real 3NF schemas are already in
+BCNF in practice.
+
+</details>
+
+<details id="what-is-denormalization">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is denormalization, and when is it a reasonable tradeoff instead of a mistake?</summary>
+
+Deliberately reintroducing redundancy (e.g. storing a snapshot column that duplicates another
+table's data) to avoid the cost of repeated joins on hot read paths. It's reasonable once a
+specific read pattern is proven expensive — the default should still be to normalize first.
+
+</details>
+
+<details id="many-to-many-junction-table">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does an ER diagram represent a many-to-many relationship, and why can't a plain foreign key do it?</summary>
+
+A single foreign key can only point one row at one other row, which can't express "many rows relate
+to many rows." A many-to-many relationship needs a separate junction/associative table (e.g.
+`enrollments(student_id, course_id)`) whose composite primary key is the pair of foreign keys.
+
+</details>
+
+Full explanation → [Normalization & Schema Design](../dbms/03-normalization-and-schema-design.md)
+
+## Indexing (7 questions)
+
+<details id="what-is-an-index">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is an index, and what does it cost you in exchange for faster reads?</summary>
+
+A separate ordered structure mapping column values to row locations, turning an `O(n)` table scan
+into an `O(log n)` tree lookup. The cost: every index must be kept in sync on every write, and it
+uses extra disk space — a read/write tradeoff, not a free upgrade.
+
+</details>
+
+<details id="b-tree-vs-b-plus-tree">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a B-tree and a B+tree, and why do databases use B+trees?</summary>
+
+A classic B-tree stores keys and data at every node. A B+tree stores keys only in internal
+(navigation) nodes and all data in linked leaf nodes. That leaf linked-list lets range queries and
+`ORDER BY` walk sequentially without re-traversing the tree, which is why almost every general
+relational index is actually a B+tree.
+
+</details>
+
+<details id="hash-index-vs-btree-index">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a hash index and a B+tree index?</summary>
+
+A hash index gives O(1) average equality lookups but can't support range queries or sorting, since
+hashing destroys ordering. A B+tree index is slightly slower for pure equality but supports
+equality, range, prefix, and sorted queries — which is why it's the general-purpose default.
+
+</details>
+
+<details id="clustered-vs-nonclustered-index">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a clustered and a non-clustered index?</summary>
+
+A clustered index determines the physical row order on disk — the table IS the index's leaf level,
+and there can be only one per table. A non-clustered (secondary) index is a separate structure
+pointing back to the table's storage, and a table can have many.
+
+</details>
+
+<details id="composite-index-column-order">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does column order matter in a composite index?</summary>
+
+A composite B+tree index is only usable for queries filtering on a left-prefix of its columns —
+the leading column, or the leading columns in order. A query filtering only on a non-leading column
+can't use the index efficiently, which is the leading cause of "I have an index but it's not being
+used" bugs.
+
+</details>
+
+<details id="what-is-a-covering-index">
+<summary><span className="qb-badge qb-badge--core">Core</span>What makes an index a "covering" index?</summary>
+
+An index is covering for a query when every column the query needs (select list, filter, order by)
+is present in the index itself, letting the database answer entirely from the index without a
+bookmark lookup back to the table.
+
+</details>
+
+<details id="index-write-tradeoff">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why isn't it free to add an index to every column you might query?</summary>
+
+Every write to an indexed column must update every index on that column too, not just the row —
+so more indexes mean slower writes and more memory/disk pressure competing with the buffer pool.
+Index the columns actually filtered/sorted/joined on frequently, not preemptively.
+
+</details>
+
+Full explanation → [Indexing](../dbms/04-indexing.md)
+
+## Transactions & ACID (6 questions)
+
+<details id="acid-properties">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does each letter in ACID actually guarantee?</summary>
+
+Atomicity: all-or-nothing execution. Consistency: valid-state-to-valid-state, respecting
+constraints. Isolation: concurrent transactions don't see each other's uncommitted state (degree
+configurable). Durability: once committed, a change survives a crash.
+
+</details>
+
+<details id="transaction-states">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the states a transaction moves through from start to finish?</summary>
+
+Active (statements executing) → Partially committed (final statement ran, not yet durable) →
+Committed (permanent), or Active/Partially committed → Failed (error) → Aborted (rolled back to the
+pre-transaction state).
+
+</details>
+
+<details id="implicit-vs-explicit-transactions">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>If you never explicitly write BEGIN, is your statement still running inside a transaction?</summary>
+
+Yes — most databases default to autocommit, wrapping every single statement in its own implicit
+transaction that commits immediately on success. `BEGIN`/`START TRANSACTION` just turns off
+autocommit so multiple statements can be grouped into one explicit atomic unit.
+
+</details>
+
+<details id="commit-vs-rollback">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between COMMIT and ROLLBACK?</summary>
+
+COMMIT ends the transaction and makes its changes permanent and visible to others. ROLLBACK ends
+the transaction and discards every change made since it began, restoring the pre-transaction state.
+
+</details>
+
+<details id="what-is-a-savepoint">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a savepoint, and why would you use one instead of just rolling back the whole transaction?</summary>
+
+A named marker inside a transaction you can roll back to without discarding the whole transaction —
+useful when only one step of a multi-step transaction might fail in a recoverable way and the rest
+should still be able to commit.
+
+</details>
+
+<details id="durability-implementation">
+<summary><span className="qb-badge qb-badge--core">Core</span>How is durability actually guaranteed if the server loses power right after a commit?</summary>
+
+Via write-ahead logging: the change is appended to a durable log file and fsynced *before* the
+transaction is acknowledged as committed, so even if the in-memory data page hasn't been flushed
+yet, the log has enough information to reconstruct it on recovery. See Storage & Recovery for the
+mechanics.
+
+</details>
+
+Full explanation → [Transactions & ACID](../dbms/05-transactions-and-acid.md)
+
+## Concurrency Control & Isolation Levels (7 questions)
+
+<details id="dirty-vs-nonrepeatable-vs-phantom-read">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a dirty read, a non-repeatable read, and a phantom read?</summary>
+
+Dirty read: reading another transaction's uncommitted (possibly later rolled-back) change.
+Non-repeatable read: re-reading the same row and getting a different value because it was updated
+and committed in between. Phantom read: re-running the same range query and getting a different set
+of rows because rows were inserted/deleted in between.
+
+</details>
+
+<details id="isolation-levels">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the four standard SQL isolation levels, and which anomalies does each one prevent?</summary>
+
+Read Uncommitted prevents none of the three anomalies. Read Committed prevents dirty reads. Repeatable
+Read additionally prevents non-repeatable reads. Serializable prevents all three, including phantom
+reads.
+
+</details>
+
+<details id="two-phase-locking">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is Two-Phase Locking, and why does the "two-phase" structure matter?</summary>
+
+A transaction has a growing phase (acquiring locks as needed) and a shrinking phase (releasing
+them), and once it releases any lock it may never acquire another. That structure is what
+guarantees the resulting schedule is serializable; real databases use strict 2PL, holding all locks
+until commit/rollback.
+
+</details>
+
+<details id="what-is-mvcc">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is MVCC, and how does it let readers avoid blocking behind writers?</summary>
+
+Multi-Version Concurrency Control keeps multiple versions of a row; each transaction reads a
+consistent snapshot as of when it started while writers create new versions instead of overwriting
+in place. Readers never block on writers or vice versa — how PostgreSQL/MySQL/Oracle implement
+Read Committed/Repeatable Read without locking readers out.
+
+</details>
+
+<details id="optimistic-vs-pessimistic-locking">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between optimistic and pessimistic locking?</summary>
+
+Pessimistic locking acquires a lock up front (`SELECT ... FOR UPDATE`), assuming conflicts are
+likely, blocking other transactions. Optimistic locking doesn't lock anything up front — it checks
+a version column at write time and rejects/retries if the row changed, assuming conflicts are rare.
+
+</details>
+
+<details id="what-is-a-deadlock">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a deadlock, and how does a database detect and resolve one?</summary>
+
+Two or more transactions each hold a lock the other needs, so neither can proceed. Databases detect
+this via a wait-for graph, looking for cycles; when found, they abort a "victim" transaction
+(usually the cheaper one to roll back) so the other can proceed. Consistent lock ordering across
+code paths prevents cycles from forming in the first place.
+
+</details>
+
+<details id="default-isolation-level-tradeoff">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Which isolation level do most production databases default to, and why not always use SERIALIZABLE?</summary>
+
+Most default to Read Committed (PostgreSQL, Oracle, SQL Server) or Repeatable Read
+(MySQL/InnoDB). Higher isolation means more blocking or more transaction retries on conflict, so
+SERIALIZABLE is reserved for the specific transactions that genuinely can't tolerate any anomaly,
+not applied universally.
+
+</details>
+
+Full explanation → [Concurrency Control & Isolation Levels](../dbms/06-concurrency-control-and-isolation.md)
+
+## Query Processing & Optimization (6 questions)
+
+<details id="what-is-a-query-execution-plan">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a query execution plan, and how does it relate to the SQL you actually wrote?</summary>
+
+SQL is declarative — you state what you want, not how to get it. The optimizer turns your query
+into a tree of physical operations (scans, joins, sorts) with estimated costs, called the execution
+plan, and picks the cheapest one it can find among the plans it considers.
+
+</details>
+
+<details id="seq-scan-vs-index-scan">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a sequential scan and an index scan in an EXPLAIN plan?</summary>
+
+A sequential scan reads every row in the table. An index scan uses an index to jump directly to
+matching rows. An index-only scan (best case) answers the query entirely from a covering index
+without touching the table at all.
+
+</details>
+
+<details id="cost-based-optimizer">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does it mean for a query optimizer to be "cost-based," and what can make it pick a bad plan?</summary>
+
+It estimates the I/O + CPU cost of several candidate plans using table statistics (row counts,
+value distributions, index selectivity) and picks the cheapest. Stale statistics after large data
+changes are a common real-world cause of a previously fast query suddenly picking a bad plan.
+
+</details>
+
+<details id="n-plus-1-problem">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the N+1 query problem, and where does it usually come from?</summary>
+
+Fetching N parent rows with one query, then issuing one additional query per row to fetch related
+data (N more queries), instead of a single join or batched `WHERE id IN (...)` fetch. It's the most
+common ORM performance bug, especially from lazy-loaded associations.
+
+</details>
+
+<details id="prepared-statements-and-plan-caching">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why are prepared statements both a performance and a security improvement?</summary>
+
+Performance: the database can cache and reuse the execution plan for the parameterized query shape
+instead of re-planning every execution. Security: parameters are bound separately from the SQL
+text rather than interpolated into it, which is the standard defense against SQL injection.
+
+</details>
+
+<details id="unexpected-sequential-scan">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>If EXPLAIN shows a sequential scan on a column you indexed, what are the likely causes?</summary>
+
+No index actually exists on the filtered column, the query doesn't match the index's leading-column
+pattern (see composite index column order), or the optimizer's cost estimate genuinely favors a
+scan — e.g. the filter matches a large fraction of the table, where a scan can be cheaper than an
+index.
+
+</details>
+
+Full explanation → [Query Processing & Optimization](../dbms/07-query-processing-and-optimization.md)
+
+## Storage, Buffer Management & Recovery (6 questions)
+
+<details id="what-is-a-database-page">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why does a database read and write fixed-size pages instead of individual rows?</summary>
+
+Disk I/O happens in fixed-size pages/blocks (typically 4–16KB), each holding many rows. A
+single-row read still costs at least one full page read, which is why row size and how tightly rows
+pack into a page directly affects I/O efficiency.
+
+</details>
+
+<details id="what-is-the-buffer-pool">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the buffer pool, and why can't writes just go straight to disk?</summary>
+
+An in-memory cache of recently/frequently used pages; reads check it before hitting disk. Writes
+modify the in-memory page (marking it dirty) and get flushed to disk later in the background — going
+straight to disk on every write would be far too slow.
+
+</details>
+
+<details id="what-is-write-ahead-logging">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is write-ahead logging, and why does it make durability practical?</summary>
+
+Before any change is applied to actual data pages, a record of it is first appended to a durable,
+sequential log file. On commit, only the log record needs to be durably written — the data page can
+be flushed later — which avoids requiring a synchronous flush of every changed data page on every
+commit.
+
+</details>
+
+<details id="what-is-checkpointing">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a checkpoint, and what problem does it solve for crash recovery?</summary>
+
+A periodic flush of all dirty buffer pool pages to disk plus a log marker noting "data is consistent
+with the log up to here." Without it, recovery would have to replay the entire log from the
+beginning of time; with it, recovery only replays from the most recent checkpoint.
+
+</details>
+
+<details id="redo-and-undo-recovery">
+<summary><span className="qb-badge qb-badge--core">Core</span>What do the redo and undo passes do during crash recovery?</summary>
+
+Redo re-applies every logged change since the last checkpoint, including from transactions that
+never committed, bringing pages back to their exact pre-crash state. Undo then rolls back the
+changes of transactions that were still active (uncommitted) at crash time.
+
+</details>
+
+<details id="why-redo-before-undo">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does recovery redo everything first, including uncommitted transactions, instead of skipping straight to undo?</summary>
+
+Because a dirty page from an uncommitted transaction might already have been flushed to disk before
+the crash. Redoing everything first guarantees pages reach a known consistent state before undo
+selectively rolls back the uncommitted parts — skipping redo could leave pages in an inconsistent
+mix of pre- and post-change data.
+
+</details>
+
+Full explanation → [Storage, Buffer Management & Recovery](../dbms/08-storage-and-recovery.md)
+
+## Replication, Sharding & NoSQL (7 questions)
+
+<details id="master-slave-vs-multi-master-replication">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between master-slave and multi-master replication?</summary>
+
+Master-slave: one node accepts writes, others are read-only replicas — simple, avoids write
+conflicts, but the primary bottlenecks write throughput and is a single point of failure for
+writes. Multi-master: more than one node accepts writes, removing that bottleneck but introducing
+write-conflict resolution.
+
+</details>
+
+<details id="synchronous-vs-asynchronous-replication">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between synchronous and asynchronous replication, and what do you trade off?</summary>
+
+Synchronous waits for at least one replica to confirm before acknowledging a write — zero data loss
+on failover, but higher write latency. Asynchronous acknowledges immediately and replicates in the
+background — faster writes, but a crash before replication completes loses that write on failover.
+
+</details>
+
+<details id="sharding-vs-partitioning">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between sharding and partitioning?</summary>
+
+Partitioning is the general concept of splitting a table's data into smaller pieces. Sharding
+specifically means splitting data across separate database servers/nodes. Some engines also
+partition within a single node purely for manageability, which isn't sharding at all.
+
+</details>
+
+<details id="horizontal-vs-vertical-partitioning">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between horizontal and vertical partitioning?</summary>
+
+Horizontal partitioning splits a table by rows across nodes (e.g. users 1–1M on one shard, 1M–2M on
+another). Vertical partitioning splits by columns — e.g. moving rarely-accessed columns to a
+separate table or database.
+
+</details>
+
+<details id="sharding-strategies">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What are the tradeoffs between range-based and hash-based sharding?</summary>
+
+Range-based shards by a value range — simple, but can create hot spots if traffic skews toward one
+range (e.g. always the most recent dates). Hash-based spreads load evenly by hashing the shard key,
+but range queries then have to fan out across every shard instead of hitting one.
+
+</details>
+
+<details id="cap-theorem">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does the CAP theorem actually say you have to give up, and when?</summary>
+
+During a network partition, a distributed system must choose between Consistency (every read gets
+the latest write, or an error) and Availability (every request gets a response, possibly stale).
+You can't have both during the partition — AP systems (e.g. Cassandra) favor availability, CP
+systems favor consistency and refuse requests instead.
+
+</details>
+
+<details id="when-to-choose-nosql">
+<summary><span className="qb-badge qb-badge--core">Core</span>When does it actually make sense to reach for a NoSQL database instead of an RDBMS?</summary>
+
+When the schema is genuinely variable per record (document stores), the access pattern is simple
+high-throughput key lookups (key-value), the data is huge/flat/write-heavy with few joins
+(wide-column), or queries are deep relationship traversals (graph). It's the wrong choice for
+genuinely relational domains where you'd just reinvent joins and transactions in application code.
+
+</details>
+
+Full explanation → [Replication, Sharding & NoSQL](../dbms/09-replication-sharding-and-nosql.md)
