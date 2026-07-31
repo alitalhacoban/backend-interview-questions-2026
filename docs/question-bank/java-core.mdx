@@ -1,0 +1,522 @@
+---
+title: Java Core
+sidebar_label: Java Core
+---
+
+import ExpandCollapseAll from '@site/src/components/ExpandCollapseAll';
+import Flashcards from '@site/src/components/Flashcards';
+
+# Java Core
+
+Every Java Core interview question on this site, grouped by subtopic — 48 questions across 8
+sections. Click a question to reveal its answer &mdash; try answering it yourself first, then
+check. Each section ends with a link to the topic's full explanation in `docs/java-core` if you
+need the deeper "why," diagrams, or code.
+
+<ExpandCollapseAll />
+<Flashcards />
+
+## OOP Fundamentals (6 questions)
+
+<details id="four-pillars-of-oop">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the four pillars of OOP in Java, and can you give a concrete example distinguishing encapsulation from abstraction?</summary>
+
+Encapsulation, abstraction, inheritance, and polymorphism. Encapsulation is the mechanism (hiding
+state behind private fields and controlled methods, e.g. a `BankAccount` that only lets balance
+change through `withdraw()`); abstraction is the design decision of what to expose in the first
+place (a `List` interface exposing `.add()` without revealing array vs. linked-node internals).
+
+</details>
+
+<details id="abstract-class-vs-interface">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the practical difference between an abstract class and an interface in modern Java, and when would you choose one over the other?</summary>
+
+An abstract class can hold instance state and a constructor but a class can extend only one;
+an interface can't hold instance state (only constants) but a class can implement many. Use an
+abstract class when subclasses share real state/implementation in a genuine "is-a" hierarchy; use
+an interface to define a capability unrelated classes can plug into.
+
+</details>
+
+<details id="overloading-vs-overriding">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between method overloading and method overriding, and how does the JVM resolve each?</summary>
+
+Overloading (same name, different parameter signature within a class) is resolved at **compile
+time** based on the arguments' static types. Overriding (subclass redefines a superclass method
+with the same signature) is resolved at **runtime** via virtual method dispatch based on the
+object's actual class.
+
+</details>
+
+<details id="final-keyword-meanings">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does the `final` keyword mean when applied to a class, a method, and a variable respectively?</summary>
+
+On a class: cannot be subclassed. On a method: cannot be overridden. On a variable: the reference
+can't be reassigned after initialization — but if it points to a mutable object, that object's
+contents can still change; `final` doesn't make the referenced object itself immutable.
+
+</details>
+
+<details id="composition-over-inheritance">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is composition often preferred over inheritance?</summary>
+
+Inheritance tightly couples a subclass to its superclass's implementation (the "fragile base
+class" problem) and Java allows extending only one class. Composition — holding a reference to
+another object and delegating to it — keeps classes decoupled, swappable, and easier to test,
+without giving up polymorphism where it's genuinely needed via interfaces.
+
+</details>
+
+<details id="private-method-override-edge-case">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Can a private method be overridden in Java? What actually happens if a subclass declares a method with the same signature?</summary>
+
+No — private methods aren't inherited or visible to subclasses at all, so they can't be overridden.
+If a subclass declares a method with the identical signature, it's a completely new, unrelated
+method that just happens to share a name; it doesn't participate in polymorphic dispatch and isn't
+subject to `@Override` checking against the parent's private method.
+
+</details>
+
+Full explanation → [OOP Fundamentals](../java-core/01-oop-fundamentals.md)
+
+## JVM & Memory Model (6 questions)
+
+<details id="jvm-runtime-data-areas">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the main runtime data areas of the JVM, and which are per-thread vs. shared across threads?</summary>
+
+Shared: the heap (all objects) and metaspace (class metadata). Per-thread: the JVM stack (stack
+frames for local variables), the PC register (current instruction pointer), and the native method
+stack. Local variables living on a per-thread stack is exactly why they're thread-safe by default.
+
+</details>
+
+<details id="stack-vs-heap-errors">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between the stack and the heap, and what causes a `StackOverflowError` vs. an `OutOfMemoryError`?</summary>
+
+The stack holds per-thread method call frames (local variables); the heap holds all objects,
+shared across threads. Unbounded recursion exhausts the fixed-size stack, throwing
+`StackOverflowError`. Too much live, reachable data on the heap throws `OutOfMemoryError: Java
+heap space` once it's full.
+
+</details>
+
+<details id="generational-gc">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does generational garbage collection work, and why does splitting the heap into young and old generations help?</summary>
+
+Most objects die young, so the heap is split into a young generation (Eden + survivor spaces),
+collected frequently and cheaply by minor GC, and an old generation for long-lived objects,
+collected less often by major/full GC. This avoids repeatedly rescanning long-lived objects
+(caches, singletons) on every collection cycle.
+
+</details>
+
+<details id="gc-types">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a minor GC, a major GC, and a full GC?</summary>
+
+Minor GC collects only the young generation and is fast and frequent. Major GC collects the old
+generation. Full GC collects the entire heap (young + old, typically plus metaspace) and is the
+expensive, noticeable-pause event — often a sign objects are being promoted too fast or the old
+generation is undersized.
+
+</details>
+
+<details id="finalize-deprecated">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is `finalize()` deprecated, and what should be used instead for resource cleanup?</summary>
+
+`finalize()` has no timing guarantee (the GC decides if/when to run it), adds GC overhead, and can
+even resurrect objects. Use `AutoCloseable` with try-with-resources for deterministic cleanup, or
+`java.lang.ref.Cleaner` as a last-resort safety net.
+
+</details>
+
+<details id="memory-leak-with-gc">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Can a Java application still leak memory even though the JVM has automatic garbage collection? How?</summary>
+
+Yes — the GC only reclaims objects that are unreachable. A "leak" happens when objects stay
+reachable long after they're logically no longer needed (e.g. a growing static `List` or cache
+nobody ever clears, or listeners registered but never unregistered), so the GC correctly refuses
+to collect them.
+
+</details>
+
+Full explanation → [JVM & Memory Model](../java-core/02-jvm-and-memory-model.md)
+
+## Collections Framework (6 questions)
+
+<details id="hashmap-internals">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does HashMap store and retrieve entries internally, and what role does `hashCode()` play?</summary>
+
+A HashMap is a bucket array; `hashCode()` (spread by a supplemental hash function) determines
+which bucket an entry lands in via `hash & (table.length - 1)`. On lookup, the same hash finds the
+bucket, then `equals()` distinguishes between entries within that bucket — which is why both
+methods must be overridden consistently for custom key types.
+
+</details>
+
+<details id="hashmap-collision-handling">
+<summary><span className="qb-badge qb-badge--core">Core</span>What happens when two keys collide in a HashMap bucket, and how did Java 8 change this?</summary>
+
+Colliding entries chain together within the bucket. Before Java 8 that chain was always a linked
+list (O(n) lookup within the bucket); since Java 8, a bucket with 8+ entries (and a table of at
+least 64 buckets) converts to a red-black tree, bounding worst-case lookup to O(log n) and
+defending against hash-flooding.
+
+</details>
+
+<details id="arraylist-vs-linkedlist">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the practical difference between ArrayList and LinkedList, and which should you default to?</summary>
+
+ArrayList is a dynamic array: O(1) random access, O(n) mid-list insert/remove. LinkedList is a
+doubly-linked list: O(1) insert/remove at a known node but O(n) random access. Default to
+ArrayList — its contiguous, cache-friendly layout usually wins even for insert-heavy workloads once
+pointer-chasing and per-node allocation overhead are accounted for.
+
+</details>
+
+<details id="fail-fast-vs-fail-safe-iterators">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between fail-fast and fail-safe iterators?</summary>
+
+Fail-fast iterators (ArrayList, HashMap) track a modification count and throw
+`ConcurrentModificationException` if the collection is structurally changed outside the iterator
+during iteration — a best-effort bug detector, not a concurrency guarantee. Fail-safe iterators
+(CopyOnWriteArrayList, ConcurrentHashMap) iterate a snapshot or concurrency-safe structure and
+never throw, though they may not reflect later changes.
+
+</details>
+
+<details id="comparable-vs-comparator">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between Comparable and Comparator?</summary>
+
+`Comparable` is implemented by the class itself and defines its single natural ordering
+(`compareTo`). `Comparator` is a separate object defining an external ordering — useful for
+multiple orderings of the same type, or when you can't modify the class at all.
+
+</details>
+
+<details id="concurrenthashmap-locking-strategy">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why is ConcurrentHashMap safe for concurrent access without locking the entire map, and how does that differ from a synchronized HashMap?</summary>
+
+A synchronized-wrapped HashMap serializes every access behind one map-wide lock. ConcurrentHashMap
+locks at the granularity of individual bins (synchronizing only on the bin being modified, plus
+CAS for insertion) and keeps reads largely lock-free via volatile reads — letting many threads
+write to different bins concurrently instead of contending on a single lock.
+
+</details>
+
+Full explanation → [Collections Framework](../java-core/03-collections-framework.md)
+
+## Exception Handling (6 questions)
+
+<details id="checked-vs-unchecked-exceptions">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between checked and unchecked exceptions, and how does that shape method signature design?</summary>
+
+Checked exceptions (subclasses of `Exception`, excluding `RuntimeException`) must be caught or
+declared — meant for expected, recoverable conditions the caller should be forced to consider.
+Unchecked exceptions (`RuntimeException`/`Error`) need no declaration — meant for programming
+errors that shouldn't force every method up the chain to declare a `throws` clause.
+
+</details>
+
+<details id="try-with-resources">
+<summary><span className="qb-badge qb-badge--core">Core</span>How does try-with-resources work, and what interface must a resource implement?</summary>
+
+The resource must implement `AutoCloseable` (or `Closeable`). The compiler generates code
+equivalent to a `finally` block calling `close()` automatically, even if the try block throws.
+Multiple resources close in reverse declaration order, and an exception from `close()` is attached
+as a suppressed exception rather than replacing the original.
+
+</details>
+
+<details id="finally-block-guarantees">
+<summary><span className="qb-badge qb-badge--core">Core</span>Does code in a finally block always run? What are the exceptions to that?</summary>
+
+Almost always — even on return, throw, or break/continue — but not if the JVM process is killed
+(`System.exit()`, `Runtime.halt()`, an external kill) or the executing thread dies from an uncaught
+`Error`. Also watch for a `return` inside `finally` silently overriding a `return` from `try`.
+
+</details>
+
+<details id="custom-exceptions">
+<summary><span className="qb-badge qb-badge--core">Core</span>When should you create a custom exception class instead of reusing a built-in one?</summary>
+
+When the failure represents a distinct business condition callers need to handle differently
+(e.g. `InsufficientFundsException`), or you need to attach structured context a built-in type has
+no field for. Avoid it when a built-in type (`IllegalArgumentException`,
+`IllegalStateException`) already communicates the failure precisely.
+
+</details>
+
+<details id="exception-chaining">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is exception chaining, and why does it matter for debugging?</summary>
+
+Passing the original exception as the "cause" to a new exception (e.g.
+`new OrderPersistenceException(msg, sqlException)`) preserves the original stack trace and type,
+retrievable via `getCause()`. Without it, translating an exception across layers loses the
+root-cause information needed to actually diagnose the failure.
+
+</details>
+
+<details id="swallowing-exceptions-anti-pattern">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What's wrong with catching `Exception` and silently swallowing it, and what should you do instead?</summary>
+
+It discards diagnostic information and lets execution continue as if nothing failed, potentially
+leaving the system in an inconsistent state while looking healthy — and catching `Exception`
+broadly also catches unrelated bugs it wasn't meant to handle. Catch the specific exception type
+you can actually recover from, and log with context or rethrow (often wrapped) instead of
+discarding it.
+
+</details>
+
+Full explanation → [Exception Handling](../java-core/04-exception-handling.md)
+
+## Concurrency (6 questions)
+
+<details id="runnable-vs-thread">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between implementing Runnable and extending Thread?</summary>
+
+Extending `Thread` burns your one superclass slot (Java has single inheritance) and couples the
+task to the execution mechanism. Implementing `Runnable` separates the task from execution, so the
+same task can also be submitted to an `ExecutorService` instead of always spawning a raw thread.
+
+</details>
+
+<details id="synchronized-vs-lock">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does the `synchronized` keyword actually guarantee, and how does it differ from using a `Lock`?</summary>
+
+`synchronized` guarantees mutual exclusion and a happens-before edge via the intrinsic monitor
+lock, and releases automatically even on exception. `Lock` (e.g. `ReentrantLock`) gives the same
+mutual exclusion plus `tryLock()`, interruptible waiting, fairness, and multiple conditions — but
+must be released manually, always in a `finally`.
+
+</details>
+
+<details id="volatile-guarantees">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does `volatile` guarantee, and what does it not guarantee?</summary>
+
+It guarantees visibility (writes are immediately visible to other threads) and ordering (prevents
+reordering around that variable). It does **not** guarantee atomicity of compound operations —
+`count++` on a volatile `int` is still a read-modify-write race between threads; use
+`AtomicInteger` or `synchronized` for that.
+
+</details>
+
+<details id="executorservice-vs-manual-threads">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why should you prefer ExecutorService/thread pools over manually creating threads?</summary>
+
+Creating a `Thread` per task is expensive (OS-level creation/teardown) and gives no control over
+how many run concurrently. A thread pool reuses a bounded set of workers across many tasks,
+provides lifecycle management, and integrates with `Future`/`CompletableFuture` for results and
+composition.
+
+</details>
+
+<details id="deadlock-conditions">
+<summary><span className="qb-badge qb-badge--core">Core</span>What four conditions must hold for a deadlock to occur, and how do you avoid them?</summary>
+
+Mutual exclusion, hold-and-wait, no preemption, and circular wait — all four must hold
+simultaneously. The most practical mitigation is breaking circular wait: always acquire multiple
+locks in one globally consistent order; `tryLock()` with a timeout is another common fix.
+
+</details>
+
+<details id="happens-before-jmm">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>What is the happens-before relationship in the Java Memory Model, and why does it matter even when using volatile/synchronized?</summary>
+
+Without an established happens-before edge (via `synchronized` unlock/lock, a volatile write/read,
+`Thread.start()`, or `join()`), the JMM permits the compiler/CPU to reorder or cache writes so
+another thread never observes them. It matters because the edge only forms between threads that
+actually synchronize on the same lock or variable — unrelated plain-field writes between threads
+with no such edge can still be observed out of order.
+
+</details>
+
+Full explanation → [Concurrency](../java-core/05-concurrency.md)
+
+## Generics & Type Erasure (6 questions)
+
+<details id="type-erasure">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is type erasure, and what does it mean for generics at runtime?</summary>
+
+The compiler uses generic type parameters only for compile-time checking, then erases them —
+`List<String>` and `List<Integer>` both become the raw `List` in bytecode. This is why
+`list1.getClass() == list2.getClass()` is `true` regardless of their declared generic type, and it
+exists mainly to preserve binary compatibility with pre-generics code.
+
+</details>
+
+<details id="bounded-wildcards-pecs">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `? extends T` and `? super T`, and what does PECS stand for?</summary>
+
+`? extends T` lets you safely read a `T` out but not add to it (unknown exact subtype). `? super T`
+lets you safely add a `T` but reading only guarantees `Object`. PECS — "Producer Extends, Consumer
+Super" — is the mnemonic: use `extends` for a data source you read from, `super` for a sink you
+write into.
+
+</details>
+
+<details id="generic-array-creation">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why can't you create an array of a generic type in Java?</summary>
+
+Arrays are reified (they enforce their element type at runtime); generics, due to erasure, are
+not. Allowing `new List<String>[10]` would let a `List<Integer>` be silently stored into a slot
+meant for `List<String>`, defeating generics' whole type-safety purpose — so the compiler forbids
+it outright.
+
+</details>
+
+<details id="bridge-methods">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's a bridge method, and why does the compiler generate one?</summary>
+
+After erasure, an implemented generic interface method (e.g. `Comparable<String>.compareTo(String)`)
+needs to line up with the erased interface signature (`compareTo(Object)`) so polymorphic dispatch
+still works. The compiler generates a synthetic bridge method that casts and delegates to the real
+implementation, invisible in source but present in bytecode.
+
+</details>
+
+<details id="raw-types">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's a raw type, and why should it be avoided?</summary>
+
+A raw type is a generic type used without its parameter (`List` instead of `List<String>`),
+kept only for backward compatibility. It disables all compile-time generic type checking, so
+mismatched insertions compile fine and only surface as a `ClassCastException` later, far from the
+actual mistake.
+
+</details>
+
+<details id="generic-overload-erasure-conflict">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Why does overloading two methods that differ only by generic type parameter (e.g. `List<String>` vs. `List<Integer>`) fail to compile?</summary>
+
+Because of erasure, both signatures collapse to the same bytecode-level method (`process(List)`)
+after compilation — the compiler can't generate two distinct overloads that differ only in an
+erased type parameter, so it rejects it as a duplicate method.
+
+</details>
+
+Full explanation → [Generics & Type Erasure](../java-core/06-generics-and-type-erasure.md)
+
+## Streams & Functional Interfaces (6 questions)
+
+<details id="functional-interfaces-and-lambdas">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's a functional interface, and how does a lambda expression relate to it?</summary>
+
+A functional interface is any interface with exactly one abstract method (plus any number of
+`default`/`static` methods). A lambda expression is syntactic sugar for an anonymous instance of a
+functional interface — the lambda body becomes the implementation of that single abstract method.
+
+</details>
+
+<details id="intermediate-vs-terminal-stream-ops">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between intermediate and terminal operations in the Stream API?</summary>
+
+Intermediate operations (`filter`, `map`, `sorted`) return another stream and are lazy — they just
+record a pipeline step. Terminal operations (`collect`, `forEach`, `count`) trigger actual
+traversal and produce a non-stream result. A stream pipeline with no terminal operation does no
+work at all.
+
+</details>
+
+<details id="stream-laziness">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why are streams lazy, and what's a concrete consequence of that laziness?</summary>
+
+Laziness lets a pipeline process elements one at a time end-to-end instead of materializing an
+intermediate collection at every step. A concrete consequence: `findFirst()` short-circuits,
+processing only as many elements as needed to produce one result, instead of running the full
+pipeline over the entire source first — which also lets short-circuiting operations work on
+infinite streams.
+
+</details>
+
+<details id="optional-purpose-and-misuse">
+<summary><span className="qb-badge qb-badge--core">Core</span>What problem does Optional solve, and what's a common misuse of it?</summary>
+
+`Optional` makes a value's possible absence part of the return type, forcing callers to explicitly
+handle it instead of risking an unchecked `NullPointerException` from an unguarded `null`. Common
+misuse: calling `.get()` without checking presence first (just trades one exception risk for
+another), or using `Optional` as a field/parameter type instead of a return type.
+
+</details>
+
+<details id="method-reference-kinds">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the three kinds of method references, and when would you use each?</summary>
+
+Static/bound-instance references (`ClassName::staticMethod`, `obj::instanceMethod`) when the
+target is fixed; unbound instance references (`ClassName::instanceMethod`) where the first lambda
+parameter becomes the receiver; constructor references (`ClassName::new`) used as a
+`Supplier`/`Function` that builds a new instance.
+
+</details>
+
+<details id="stream-reuse-edge-case">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Can a stream be consumed twice? What happens if you try?</summary>
+
+No — a stream is single-use. Once a terminal operation has run, any further operation on that same
+stream instance throws `IllegalStateException`. To iterate the same data again, create a new
+stream from the source; the source collection itself is unaffected.
+
+</details>
+
+Full explanation → [Streams & Functional Interfaces](../java-core/07-streams-and-functional-interfaces.md)
+
+## Strings & Object Contracts (6 questions)
+
+<details id="why-string-is-immutable">
+<summary><span className="qb-badge qb-badge--core">Core</span>Why is String immutable in Java, and what benefits does that provide?</summary>
+
+Once created, a String's contents never change — operations like `concat` or `substring` return a
+new String instead. This enables safe string-pool sharing, free thread safety (no synchronization
+needed), cached hash codes (safe only because content can't change), and prevents a shared
+reference (e.g. a validated file path) from being silently altered elsewhere.
+
+</details>
+
+<details id="string-pool-and-interning">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the string pool, and how does it interact with `new String("x")` vs. a literal?</summary>
+
+The string pool caches one instance per unique literal so identical literals share an object.
+`new String("x")` deliberately bypasses the pool and allocates a distinct heap object, so `==`
+between it and the literal is `false` even though `.equals()` is `true`. `.intern()` returns the
+pooled instance explicitly.
+
+</details>
+
+<details id="stringbuilder-vs-concatenation">
+<summary><span className="qb-badge qb-badge--core">Core</span>When should you use StringBuilder instead of string concatenation with `+`?</summary>
+
+Inside a loop: because String is immutable, `result += s` per iteration allocates an entirely new
+String and copies everything each time, making the loop O(n²). `StringBuilder` holds a mutable
+buffer and appends in O(1) amortized time. A single one-off `a + b + c` expression is fine — the
+compiler already compiles it into an equivalent StringBuilder chain.
+
+</details>
+
+<details id="equals-hashcode-contract">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the contract between `equals()` and `hashCode()`, and what breaks if you violate it?</summary>
+
+If two objects are `.equals()`, they must return the same `hashCode()` (the converse isn't
+required). Violating it means two "equal" objects can land in different HashMap/HashSet buckets,
+so `map.get(key)` can fail to find an entry that was `.put()` with an equal key, because the lookup
+never checks the bucket it's actually stored in.
+
+</details>
+
+<details id="java-records">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are Java records, and what boilerplate do they eliminate?</summary>
+
+Records (Java 16+) are a compact syntax for immutable data carriers: declaring components
+auto-generates the constructor, accessors, and a correct `equals`/`hashCode`/`toString` — replacing
+the hand-written boilerplate that used to make simple data classes both tedious and error-prone.
+
+</details>
+
+<details id="effective-immutability-mutable-field-leak">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Is a class with only final fields necessarily immutable? What's the classic mistake that breaks this?</summary>
+
+No — `final` only stops the field from being reassigned, not the referenced object from being
+mutated. The classic mistake: storing a caller-supplied mutable object (like a `List`) directly, or
+returning an internal mutable field straight from a getter, either of which hands out a live handle
+that lets outside code mutate "immutable" state. The fix is defensive copying on the way in and out.
+
+</details>
+
+Full explanation → [Strings & Object Contracts](../java-core/08-strings-and-object-contracts.md)

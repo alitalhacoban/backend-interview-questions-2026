@@ -15,6 +15,9 @@ Live site: `https://alitalhacoban.github.io/backend-interview-questions-2026/`
 - **Kafka** &mdash; architecture and fundamentals, producer internals, consumer groups and
   rebalancing, delivery semantics, replication and ISR, the outbox/inbox pattern, and common
   production pitfalls.
+- **Java Core** &mdash; OOP fundamentals, the JVM and memory model, the collections framework,
+  exception handling, concurrency, generics and type erasure, streams and functional interfaces,
+  and string/object contracts.
 
 More topics (Spring Boot, PostgreSQL, Redis, distributed systems, API security, and others) will
 be added over time. This is a living project: expect new topics and new questions to show up on

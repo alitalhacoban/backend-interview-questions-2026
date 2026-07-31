@@ -1,0 +1,8 @@
+{
+  "label": "Java Core",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Core Java language, JVM internals, collections, concurrency, and language design questions for backend engineering interviews."
+  }
+}

@@ -103,9 +103,19 @@ const config = {
             label: 'Topics',
           },
           {
-            to: '/docs/question-bank/kafka',
+            type: 'dropdown',
             label: 'Question Bank',
             position: 'left',
+            items: [
+              {
+                to: '/docs/question-bank/kafka',
+                label: 'Kafka',
+              },
+              {
+                to: '/docs/question-bank/java-core',
+                label: 'Java Core',
+              },
+            ],
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
@@ -125,8 +135,16 @@ const config = {
                 to: '/docs/kafka/fundamentals',
               },
               {
-                label: 'Question Bank',
+                label: 'Kafka Question Bank',
                 to: '/docs/question-bank/kafka',
+              },
+              {
+                label: 'Java Core',
+                to: '/docs/java-core/oop-fundamentals',
+              },
+              {
+                label: 'Java Core Question Bank',
+                to: '/docs/question-bank/java-core',
               },
             ],
           },

@@ -19,7 +19,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/kafka/fundamentals">
-            Start with Kafka →
+            Browse the Topics →
           </Link>
           <Link
             className="button button--secondary button--lg"
@@ -65,6 +65,13 @@ export default function Home() {
                     architecture, producer/consumer internals, delivery
                     semantics, replication, the outbox/inbox pattern, and
                     common pitfalls.
+                  </li>
+                  <li>
+                    <Link to="/docs/java-core/oop-fundamentals">Java Core</Link>{' '}
+                    &mdash; OOP fundamentals, the JVM and memory model, the
+                    collections framework, exception handling, concurrency,
+                    generics and type erasure, streams and functional
+                    interfaces, and string/object contracts.
                   </li>
                 </ul>
                 <p>
