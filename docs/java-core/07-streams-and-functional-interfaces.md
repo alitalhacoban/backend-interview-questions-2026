@@ -48,6 +48,36 @@ long count = stream.count();       // Terminal: this is what actually triggers e
   traversal of the source and produce a non-stream result (a collection, a value, or nothing for
   `forEach`). A stream with no terminal operation does no work at all.
 
+## `Collectors`, `reduce`, and `flatMap`
+
+```java
+Map<Department, List<Employee>> byDept =
+    employees.stream().collect(Collectors.groupingBy(Employee::getDepartment));
+
+Map<Boolean, List<Employee>> byTenure =
+    employees.stream().collect(Collectors.partitioningBy(e -> e.getYears() > 5));
+
+Map<String, BigDecimal> salaryByName =
+    employees.stream().collect(Collectors.toMap(Employee::getName, Employee::getSalary));
+
+int totalYears = employees.stream()
+    .reduce(0, (sum, e) -> sum + e.getYears(), Integer::sum); // Combines a stream down to one value.
+
+List<Skill> allSkills = employees.stream()
+    .flatMap(e -> e.getSkills().stream()) // Flattens each employee's List<Skill> into one Stream<Skill>.
+    .toList();
+```
+
+`Collectors.groupingBy` buckets elements into a `Map` keyed by a classifier function (the Stream
+equivalent of SQL's `GROUP BY`); `partitioningBy` is the two-bucket special case keyed by a
+`boolean` predicate; `toMap` builds a `Map` from explicit key/value extractor functions (and throws
+on a duplicate key unless a merge function is supplied). `reduce` combines all elements into a
+single value by repeatedly applying a combining function — `sum`/`max`/`count` are really
+specialized reductions. `flatMap` is for when each element itself produces a stream of its own
+(a list of lists, an employee's list of skills): it maps each element to a stream and then
+flattens all those streams into one, which plain `map` can't do without leaving you with a
+`Stream<Stream<T>>`.
+
 ## Why streams are lazy
 
 Laziness lets the stream pipeline process elements one at a time, end-to-end, instead of

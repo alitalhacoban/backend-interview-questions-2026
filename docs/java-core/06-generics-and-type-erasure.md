@@ -12,6 +12,25 @@ you can't do `new T[10]`." The unifying idea behind almost every generics gotcha
 erasure** — once you understand that generic type information doesn't exist at runtime, most of
 the surprising restrictions stop being surprising.
 
+## What are generics, and why do they exist?
+
+```java
+List names = new ArrayList();       // Pre-generics: raw type, no compile-time element checking.
+names.add("Alice");
+names.add(42);                       // Compiles fine — trouble surfaces later as a ClassCastException.
+
+List<String> typedNames = new ArrayList<>(); // Generics: element type is part of the type itself.
+typedNames.add("Alice");
+typedNames.add(42); // Compile error, right here, at the actual mistake.
+```
+
+**Generics** (Java 5+) let a class, interface, or method be parameterized over a type, so the
+compiler can enforce type consistency at compile time instead of relying on runtime casts. Before
+generics, collections held plain `Object`, so pulling an element back out always required an
+explicit cast that could fail at runtime with a `ClassCastException` far from where the mismatched
+element was actually inserted. Generics move that error to compile time, at the exact call site
+of the mistake, and eliminate the need for the cast entirely on the read side.
+
 ## Type erasure
 
 ```java

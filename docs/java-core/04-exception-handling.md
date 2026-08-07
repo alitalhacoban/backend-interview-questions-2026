@@ -35,6 +35,22 @@ force callers to think about it; a method failing due to a bug or truly exceptio
 condition should use an unchecked exception so it doesn't pollute every signature up the call
 chain with `throws` clauses nobody meaningfully handles.
 
+## `throw` vs. `throws`
+
+```java
+void withdraw(BigDecimal amount) throws InsufficientFundsException { // throws: declares intent.
+    if (amount.compareTo(balance) > 0) {
+        throw new InsufficientFundsException(); // throw: actually raises the exception, right here.
+    }
+}
+```
+
+`throw` is a statement that actually raises a specific exception **instance** at the point it
+executes, immediately transferring control to the nearest matching `catch`. `throws` is a
+**method signature declaration** listing the checked exception types a method might propagate to
+its caller — it doesn't raise anything itself, it just informs (and compiler-enforces against)
+callers that they need to handle or re-declare those exceptions.
+
 ## try-with-resources
 
 ```java
@@ -73,6 +89,20 @@ It does **not** run if:
 A classic gotcha: if both `try` and `finally` contain a `return`, the `finally` block's `return`
 silently wins and discards the `try` block's return value — a strong reason to avoid `return`
 inside `finally`.
+
+## `final` vs. `finally` vs. `finalize`
+
+Three keywords that share four letters and nothing else, which is exactly why they're a favorite
+"gotcha" trivia question:
+
+- **`final`**: a modifier — on a class it blocks subclassing, on a method it blocks overriding, on
+  a variable it blocks reassignment (see [OOP Fundamentals](./01-oop-fundamentals.md)).
+- **`finally`**: a block attached to `try`/`catch` that runs regardless of whether the try block
+  succeeded, returned, or threw (with the narrow exceptions covered above) — used for
+  deterministic cleanup.
+- **`finalize()`**: a deprecated `Object` method the GC used to call before reclaiming an object,
+  with no timing guarantee (see [JVM & Memory Model](./02-jvm-and-memory-model.md)) — replaced by
+  `AutoCloseable`/try-with-resources or `java.lang.ref.Cleaner`.
 
 ## When to write a custom exception
 

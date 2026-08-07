@@ -139,6 +139,27 @@ strict generational boundaries.
   old generation faster than expected, or that the old generation is genuinely too small for the
   live data set.
 
+## Common garbage collectors
+
+The generational model describes *where* objects live; the **collector** is the actual algorithm
+that reclaims them, and the JVM ships several with very different tradeoffs:
+
+- **Serial**: a single-threaded, stop-the-world collector. Simplest and lowest-overhead, but pauses
+  the whole application during collection — only appropriate for small heaps or single-CPU
+  environments (`-XX:+UseSerialGC`).
+- **Parallel** (the default through Java 8): uses multiple threads for collection to reduce total
+  pause time, but still stops the world while collecting — optimized for **throughput** over pause
+  latency, good for batch jobs that don't serve live traffic.
+- **G1 (Garbage First)**: the default since Java 9. Divides the heap into many equally-sized
+  regions instead of two contiguous generations, and collects the regions with the most garbage
+  first, aiming for **predictable, bounded pause times** on large heaps rather than maximum
+  throughput.
+- **ZGC** and **Shenandoah**: low-latency collectors designed for **sub-millisecond pauses** even
+  on multi-terabyte heaps, by doing almost all of their work concurrently with the running
+  application instead of stopping it. The tradeoff is somewhat higher CPU overhead in exchange for
+  pauses that barely scale with heap size — the right choice when tail latency matters more than
+  raw throughput.
+
 ## Why `finalize()` is deprecated
 
 `Object.finalize()` was Java's original mechanism for running cleanup code before an object was

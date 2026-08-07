@@ -12,6 +12,16 @@ from those who understand what guarantees those keywords actually provide. This 
 the guarantees, not just the syntax — what `volatile` does and doesn't protect against, why
 thread pools exist, and the memory-model reasoning behind "happens-before."
 
+## Process vs. thread
+
+A **process** is an independently running program with its own isolated memory space — one
+process can't directly read another's memory without OS-mediated IPC. A **thread** is the
+smallest unit of execution *within* a process: multiple threads in the same process share that
+process's heap and static state, but each thread still gets its own call stack, program counter,
+and local variables. This is exactly why sharing heap objects across threads needs explicit
+synchronization (they really do share memory) while sharing data across processes doesn't
+happen by accident (they don't).
+
 ## Runnable vs. Thread
 
 ```java
@@ -28,6 +38,22 @@ for two reasons: Java has single inheritance, so extending `Thread` burns your o
 and prevents extending anything else; and separating the *task* (`Runnable`) from the *execution
 mechanism* (`Thread`) means the same task can be submitted to an `ExecutorService` instead of
 always spawning a brand-new OS thread.
+
+## `start()` vs. `run()`
+
+```java
+Thread t = new Thread(() -> System.out.println(Thread.currentThread().getName()));
+
+t.start(); // Asks the OS for a new thread; that new thread then calls run(). Prints "Thread-0".
+t.run();   // Just an ordinary method call on the current thread. Prints "main".
+```
+
+`start()` asks the JVM/OS to allocate a new native thread, which then invokes `run()` on that new
+thread — this is the only way to actually achieve concurrent execution. Calling `run()` directly
+is just an ordinary method invocation on whichever thread called it (usually the current one),
+running synchronously with no new thread created at all. Calling `start()` twice on the same
+`Thread` object also throws `IllegalThreadStateException` — a thread can only ever be started
+once.
 
 ## `synchronized` vs. `Lock`
 
@@ -55,6 +81,26 @@ but adds capabilities `synchronized` doesn't have: `tryLock()` (attempt without 
 `lockInterruptibly()` (respond to interruption while waiting), fairness policies, and multiple
 condition variables (`Condition`) per lock. The tradeoff is that it must be released manually
 (always in a `finally`) — there's no compiler-enforced release.
+
+## `wait()`, `sleep()`, and `yield()`
+
+```java
+synchronized (lock) {
+    lock.wait(); // Releases `lock` and pauses until notify()/notifyAll() — must hold the lock to call it.
+}
+
+Thread.sleep(1000); // Pauses THIS thread for ~1s, holding onto any locks it already has.
+Thread.yield();     // A hint to the scheduler: "let another thread of equal priority run now."
+```
+
+Three easily-confused pause mechanisms: **`wait()`** (defined on `Object`, only callable while
+holding that object's monitor) releases the lock and suspends the thread until another thread
+calls `notify()`/`notifyAll()` on the same object — the basis of producer-consumer coordination.
+**`sleep()`** (a static `Thread` method) pauses the current thread for a fixed duration **without**
+releasing any locks it holds, which can itself cause contention if overused inside a synchronized
+block. **`yield()`** is only a hint to the scheduler that the current thread is willing to let
+other equal-priority threads run — the JVM is free to ignore it entirely, and it provides no
+timing or ordering guarantee at all.
 
 ## What `volatile` guarantees (and doesn't)
 

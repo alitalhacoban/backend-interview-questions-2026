@@ -142,6 +142,134 @@ The common guidance "favor composition over inheritance" doesn't mean inheritanc
 means reach for it only when there's a genuine, stable "is-a" relationship and you actually need
 polymorphic substitution; otherwise composition keeps classes decoupled and easier to test.
 
+## Constructors, and why a constructor might be private
+
+```java
+class Point {
+    int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+    Point() { this(0, 0); } // this(...) chains to another constructor in the same class.
+}
+
+class Singleton {
+    private static final Singleton INSTANCE = new Singleton();
+    private Singleton() {} // Private: nobody outside this class can call `new Singleton()`.
+    static Singleton getInstance() { return INSTANCE; }
+}
+```
+
+A **constructor** initializes a new object's state and runs exactly once per instance, at creation
+time. `this(...)` chains to another constructor in the same class; `super(...)` (implicit if
+omitted) chains to the superclass's constructor — either must be the first statement if used. A
+**private constructor** doesn't prevent object creation altogether; it prevents creation *from
+outside the class*, which is exactly the mechanism behind the Singleton pattern (only the class
+itself can call `new`), static factory methods (`Optional.of(...)`, `List.of(...)`), and
+utility/helper classes that should never be instantiated at all (a private constructor plus only
+static members).
+
+## Shallow copy vs. deep copy
+
+```java
+class Team implements Cloneable {
+    List<String> members;
+
+    @Override
+    public Team clone() throws CloneNotSupportedException {
+        return (Team) super.clone(); // Object.clone(): shallow — copies the field, not what it points to.
+    }
+}
+
+Team original = new Team();
+original.members = new ArrayList<>(List.of("Alice"));
+Team copy = original.clone();
+copy.members.add("Bob"); // Also shows up in original.members — they share the SAME List instance!
+```
+
+A **shallow copy** duplicates an object's fields as-is: primitive fields get independent copies,
+but reference fields still point to the exact same underlying objects as the original — mutating
+a shared referenced object through the copy also affects the original. `Object.clone()`'s default
+behavior is shallow. A **deep copy** recursively copies every referenced object too, so the copy
+and the original share no mutable state at all. Achieving a real deep copy usually means manually
+cloning each mutable field (`this.members = new ArrayList<>(other.members)`) rather than relying on
+`super.clone()`, since Java has no built-in automatic deep-clone mechanism.
+
+## Multiple inheritance and the diamond problem
+
+```java
+interface Flyer { default String move() { return "flying"; } }
+interface Swimmer { default String move() { return "swimming"; } }
+
+class Duck implements Flyer, Swimmer {
+    @Override
+    public String move() { return Flyer.super.move(); } // Must resolve the conflict explicitly.
+}
+```
+
+Java doesn't allow a class to `extends` more than one class, specifically to avoid the **diamond
+problem**: if `Duck extends Flyer, Swimmer` were legal and both defined conflicting *state* or
+implementation, it would be ambiguous which one `Duck` actually inherits. Java sidesteps this for
+state by only ever allowing single class inheritance — but interfaces *can* be implemented in any
+number, and since Java 8 interfaces can carry `default` method bodies, so the diamond problem
+resurfaces there: if two implemented interfaces provide the same default method, the implementing
+class **must** override it and explicitly choose (or combine) an implementation via
+`InterfaceName.super.method()`, otherwise it's a compile error rather than a silent ambiguous pick.
+
+## Marker interfaces
+
+```java
+class User implements Serializable { // No methods to implement — Serializable has none.
+    String name;
+}
+```
+
+A **marker interface** declares no methods at all; implementing it exists purely to attach metadata
+that the JVM or a framework checks via `instanceof` at runtime. `Serializable` tells the
+serialization machinery an object is safe to convert to a byte stream; `Cloneable` tells
+`Object.clone()` it's allowed to return a copy instead of throwing `CloneNotSupportedException`;
+`Remote` marks an object as eligible for RMI. Modern Java favors annotations for this kind of
+metadata, but marker interfaces remain common in legacy and JDK APIs because, unlike annotations,
+they also affect the static type system (a `Serializable` value passes an `instanceof Serializable`
+check and can be used where that type is required).
+
+## Default and static methods in interfaces
+
+```java
+interface Vehicle {
+    void drive(); // Abstract — still required.
+
+    default void honk() { System.out.println("Beep!"); } // Has a body — implementers get it for free.
+    static Vehicle economyCar() { return () -> System.out.println("driving economically"); }
+}
+```
+
+Added in Java 8 specifically to let library authors evolve interfaces without breaking every
+existing implementer: a **default method** provides a body that implementing classes inherit
+automatically unless they choose to override it — this is how `Collection` grew `stream()` and
+`forEach()` without breaking every pre-existing `List` implementation ever written. A **static
+method** on an interface is a plain utility function namespaced under the interface (like
+`Comparator.comparing(...)`) — it's not inherited by implementers at all and must be called via the
+interface name.
+
+## The `instanceof` operator
+
+```java
+Object obj = "hello";
+
+if (obj instanceof String) {
+    String s = (String) obj; // Pre-Java 16: still need a manual, redundant cast.
+    System.out.println(s.length());
+}
+
+if (obj instanceof String s) { // Java 16+ pattern matching: binds `s` directly, cast implied.
+    System.out.println(s.length());
+}
+```
+
+`instanceof` checks whether an object is an instance of a given class or interface at runtime,
+returning `false` (not an exception) for `null` on either side. Since Java 16, **pattern matching
+for `instanceof`** lets the check bind a typed local variable directly in the condition, eliminating
+the manual, boilerplate cast that used to immediately follow every `instanceof` check.
+
 ## Access modifiers
 
 | Modifier | Same class | Same package | Subclass (different package) | Everywhere |

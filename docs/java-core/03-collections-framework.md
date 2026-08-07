@@ -12,6 +12,17 @@ answer isn't "it uses hashing" — it's being able to walk through what happens 
 Java 8 changed the bucket structure, and which collection to reach for and why. This page covers
 the internals and the decision points, not just the API surface.
 
+## The Java Collections Framework
+
+The **Java Collections Framework** is the unified set of interfaces and classes for storing and
+manipulating groups of objects. It has three parts: **interfaces** defining the contracts
+(`List`, `Set`, `Map`, `Queue`), **implementations** of those contracts (`ArrayList`, `HashSet`,
+`HashMap`, `ArrayDeque`), and **algorithms** operating over them (`Collections.sort()`,
+`Collections.shuffle()`, `Collections.unmodifiableList()`). The value of the framework isn't just
+having ready-made data structures — it's that code written against the *interfaces* can swap
+implementations without changing a single call site, and every implementation gets a consistent,
+well-tested set of operations for free.
+
 ## How HashMap actually stores entries
 
 A `HashMap` is backed by an array of buckets. For a given key:
@@ -43,6 +54,21 @@ the same bucket) degrading `HashMap` to linear-scan behavior.
 
 `HashMap` also resizes (doubles its table and rehashes every entry) once the number of entries
 exceeds `capacity * loadFactor` (default load factor `0.75`) — trading memory for fewer collisions.
+
+## HashMap vs. Hashtable
+
+```java
+Map<String, Integer> modern = new HashMap<>();       // Not synchronized, allows one null key.
+Map<String, Integer> legacy = new Hashtable<>();      // Synchronized on every method, no null key/values.
+```
+
+`Hashtable` predates the Collections Framework (Java 1.0) and synchronizes every single method,
+making it thread-safe but slow under contention — and it throws `NullPointerException` on a `null`
+key or value. `HashMap` (Java 1.2) is unsynchronized and faster for single-threaded use, and
+permits one `null` key plus any number of `null` values. Neither is the right choice for modern
+concurrent code: reach for `ConcurrentHashMap` instead, which is both thread-safe and far faster
+than `Hashtable` under contention (see below). `Hashtable` is considered legacy and rarely
+appears in new code.
 
 ## ArrayList vs. LinkedList
 

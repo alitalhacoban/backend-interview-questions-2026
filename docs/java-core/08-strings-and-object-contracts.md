@@ -12,6 +12,24 @@ where interviewers catch candidates who've never actually been burned by getting
 broken `hashCode`/`equals` pair silently corrupts `HashMap` lookups, and "is this class actually
 immutable" has a real trap hiding in it even when every field is `final`.
 
+## `==` vs. `.equals()`
+
+```java
+String a = new String("hello");
+String b = new String("hello");
+
+System.out.println(a == b);        // false — two distinct objects on the heap.
+System.out.println(a.equals(b));   // true — same character content.
+```
+
+`==` on reference types compares **references** (are these two variables pointing at the exact
+same object in memory?), not content. `.equals()`, when properly overridden, compares **content**
+(are these two objects logically equivalent?). For primitives, `==` is the only option and it
+correctly compares values directly, which is often exactly why this trips people up when they
+mentally carry that habit over to objects. `.equals()`'s default implementation (from `Object`)
+just falls back to reference comparison unless a class overrides it — which is what makes the
+`equals()`/`hashCode()` contract worth understanding (see below).
+
 ## Why `String` is immutable
 
 ```java

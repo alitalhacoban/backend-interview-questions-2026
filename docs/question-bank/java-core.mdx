@@ -7,14 +7,69 @@ import PracticeTools from '@site/src/components/PracticeTools';
 
 # Java Core
 
-Every Java Core interview question on this site, grouped by subtopic — 50 questions across 8
+Every Java Core interview question on this site, grouped by subtopic — 74 questions across 9
 sections. Click a question to reveal its answer &mdash; try answering it yourself first, then
 check. Each section ends with a link to the topic's full explanation in `docs/java-core` if you
 need the deeper "why," diagrams, or code.
 
 <PracticeTools />
 
-## OOP Fundamentals (6 questions)
+## Language Fundamentals (5 questions)
+
+<details id="primitive-vs-reference-types">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are Java's eight primitive types, and how do they differ from reference types?</summary>
+
+`byte`, `short`, `int`, `long`, `float`, `double`, `boolean`, `char` — each holds its value
+directly and defaults to zero/false. Reference types (including each primitive's wrapper class,
+like `Integer`) hold a pointer to a heap-allocated object, default to `null`, and are required
+wherever generics or the Collections Framework are used, since generics can't be parameterized
+with a primitive.
+
+</details>
+
+<details id="autoboxing-and-unboxing">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is autoboxing and unboxing, and what's a common pitfall with it?</summary>
+
+Autoboxing is the compiler automatically wrapping a primitive into its wrapper class where a
+reference type is expected (`Integer i = 5`); unboxing reverses it. The classic pitfall: unboxing
+a `null` wrapper (e.g. `int x = someMap.get(missingKey)`) throws `NullPointerException` at the
+unboxing step, often nowhere near where the `null` actually originated.
+
+</details>
+
+<details id="varargs-rules">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are varargs, and what rules govern how they can be used?</summary>
+
+Varargs (`Type... name`) let a method accept zero or more arguments of the same type, compiling
+down to an ordinary array parameter under the hood. A method may declare at most one varargs
+parameter, and it must be the last parameter in the list, so the compiler can tell where fixed
+arguments end and the collected varargs begin.
+
+</details>
+
+<details id="static-vs-instance-members">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between static and instance variables/methods?</summary>
+
+A `static` member belongs to the class itself — one shared copy, accessible via the class name
+with no object required. An instance member belongs to each object individually — every `new`
+call gets its own independent copy. A static method also has no implicit `this`, so it can't
+directly reference instance fields or methods.
+
+</details>
+
+<details id="main-method-overload">
+<summary><span className="qb-badge qb-badge--edge">Edge Case</span>Can the `main()` method be overloaded? What determines which one the JVM actually calls?</summary>
+
+Yes — `main()` is an ordinary method and can be overloaded like any other. The JVM, however, only
+ever invokes the exact signature `public static void main(String[] args)` as the program's entry
+point; any other overload is just a regular method that must be called explicitly from within the
+program to ever run.
+
+</details>
+
+Full explanation → [Language Fundamentals](../java-core/00-language-fundamentals.md)
+
+## OOP Fundamentals (13 questions)
 
 <details id="four-pillars-of-oop">
 <summary><span className="qb-badge qb-badge--core">Core</span>What are the four pillars of OOP in Java, and can you give a concrete example distinguishing encapsulation from abstraction?</summary>
@@ -65,6 +120,80 @@ without giving up polymorphism where it's genuinely needed via interfaces.
 
 </details>
 
+<details id="this-vs-super">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `this` and `super`?</summary>
+
+`this` refers to the current instance — most often used to disambiguate a field from a
+constructor/method parameter sharing its name, or to chain to another constructor in the same
+class (`this(...)`). `super` refers to the immediate superclass — used to call an overridden
+method's parent implementation, or to invoke a parent constructor that isn't accessible by
+default.
+
+</details>
+
+<details id="constructors-and-private-constructors">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a constructor? Can a constructor be private, and if so, what's that used for?</summary>
+
+A constructor initializes a new object's state and runs once at creation. Yes, a constructor can
+be private — it doesn't block instantiation entirely, just instantiation *from outside the
+class*, which is exactly the mechanism behind the Singleton pattern, static factory methods
+(`Optional.of(...)`), and utility classes that should never be instantiated at all.
+
+</details>
+
+<details id="shallow-vs-deep-copy">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a shallow copy and a deep copy?</summary>
+
+A shallow copy duplicates an object's fields as-is: reference fields in the copy still point to
+the exact same underlying objects as the original, so mutating shared state through the copy
+affects the original too. A deep copy recursively copies every referenced object, so the copy and
+original share no mutable state. `Object.clone()`'s default behavior is shallow; deep copying
+usually has to be done manually field by field.
+
+</details>
+
+<details id="multiple-inheritance-diamond-problem">
+<summary><span className="qb-badge qb-badge--core">Core</span>Can Java achieve multiple inheritance? What is the diamond problem, and how does Java handle it for interface default methods?</summary>
+
+Not for classes — Java allows extending only one class, precisely to avoid the diamond problem
+(ambiguity over which parent's state/implementation wins). It resurfaces for interface `default`
+methods since a class can implement many interfaces: if two implemented interfaces provide the
+same default method, the class must override it and explicitly pick or combine an implementation
+via `InterfaceName.super.method()` — the compiler refuses to silently choose one.
+
+</details>
+
+<details id="marker-interfaces">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is a marker interface, and what's it used for?</summary>
+
+An interface with no methods at all, implemented purely to attach metadata that the JVM or a
+framework checks via `instanceof` at runtime. `Serializable` (safe to serialize) and `Cloneable`
+(allowed to `clone()`) are the classic JDK examples; modern code often prefers annotations for
+this, but marker interfaces still affect the static type system in a way annotations don't.
+
+</details>
+
+<details id="default-and-static-interface-methods">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are default and static methods in an interface, and why were they added?</summary>
+
+Added in Java 8 so library authors could evolve interfaces without breaking existing implementers.
+A `default` method has a body that implementing classes inherit automatically unless they override
+it (how `Collection` gained `stream()` without breaking every prior `List`). A `static` method is
+a utility function namespaced under the interface, not inherited by implementers, and called via
+the interface name directly.
+
+</details>
+
+<details id="instanceof-operator">
+<summary><span className="qb-badge qb-badge--core">Core</span>What does the `instanceof` operator do, and how did Java 16 change how it's typically used?</summary>
+
+`instanceof` checks whether an object is an instance of a given class or interface at runtime,
+returning `false` rather than throwing if the reference is `null`. Since Java 16, pattern matching
+for `instanceof` lets the check bind a typed local variable directly in the condition, eliminating
+the manual cast that traditionally had to follow the check.
+
+</details>
+
 <details id="private-method-override-edge-case">
 <summary><span className="qb-badge qb-badge--edge">Edge Case</span>Can a private method be overridden in Java? What actually happens if a subclass declares a method with the same signature?</summary>
 
@@ -77,7 +206,7 @@ subject to `@Override` checking against the parent's private method.
 
 Full explanation → [OOP Fundamentals](../java-core/01-oop-fundamentals.md)
 
-## JVM & Memory Model (8 questions)
+## JVM & Memory Model (9 questions)
 
 <details id="jdk-vs-jre-vs-jvm">
 <summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between the JDK, the JRE, and the JVM?</summary>
@@ -139,6 +268,18 @@ generation is undersized.
 
 </details>
 
+<details id="gc-algorithms">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are the main garbage collection algorithms available in the JVM (Serial, Parallel, G1, ZGC, Shenandoah), and how do they differ?</summary>
+
+Serial is single-threaded and stop-the-world, fine only for small heaps. Parallel uses multiple
+threads but still stops the world, optimizing for throughput. G1 (default since Java 9) splits the
+heap into many regions and collects the garbage-heaviest ones first, aiming for predictable pause
+times on large heaps. ZGC and Shenandoah do almost all their work concurrently with the running
+application to achieve sub-millisecond pauses even on very large heaps, at the cost of some extra
+CPU overhead.
+
+</details>
+
 <details id="finalize-deprecated">
 <summary><span className="qb-badge qb-badge--core">Core</span>Why is `finalize()` deprecated, and what should be used instead for resource cleanup?</summary>
 
@@ -160,7 +301,18 @@ to collect them.
 
 Full explanation → [JVM & Memory Model](../java-core/02-jvm-and-memory-model.md)
 
-## Collections Framework (6 questions)
+## Collections Framework (9 questions)
+
+<details id="java-collections-framework-overview">
+<summary><span className="qb-badge qb-badge--core">Core</span>What is the Java Collections Framework, and what are its three main parts?</summary>
+
+A unified architecture for storing and manipulating groups of objects: **interfaces** defining
+contracts (`List`, `Set`, `Map`, `Queue`), **implementations** of those contracts (`ArrayList`,
+`HashSet`, `HashMap`), and **algorithms** operating over them (`Collections.sort()`,
+`Collections.shuffle()`). Coding against the interfaces rather than concrete classes lets an
+implementation be swapped later without touching call sites.
+
+</details>
 
 <details id="hashmap-internals">
 <summary><span className="qb-badge qb-badge--core">Core</span>How does HashMap store and retrieve entries internally, and what role does `hashCode()` play?</summary>
@@ -182,6 +334,17 @@ defending against hash-flooding.
 
 </details>
 
+<details id="hashmap-vs-hashtable">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between HashMap and Hashtable?</summary>
+
+`Hashtable` predates the Collections Framework, synchronizes every method (thread-safe but slow
+under contention), and throws `NullPointerException` on a `null` key or value. `HashMap` is
+unsynchronized, faster for single-threaded use, and allows one `null` key plus `null` values.
+Neither is right for modern concurrent code — use `ConcurrentHashMap` instead, which is both
+thread-safe and much faster than `Hashtable` under contention.
+
+</details>
+
 <details id="arraylist-vs-linkedlist">
 <summary><span className="qb-badge qb-badge--core">Core</span>What's the practical difference between ArrayList and LinkedList, and which should you default to?</summary>
 
@@ -189,6 +352,17 @@ ArrayList is a dynamic array: O(1) random access, O(n) mid-list insert/remove. L
 doubly-linked list: O(1) insert/remove at a known node but O(n) random access. Default to
 ArrayList — its contiguous, cache-friendly layout usually wins even for insert-heavy workloads once
 pointer-chasing and per-node allocation overhead are accounted for.
+
+</details>
+
+<details id="hashset-vs-linkedhashset-vs-treeset">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between HashSet, LinkedHashSet, and TreeSet?</summary>
+
+`HashSet` is backed by a `HashMap` internally, gives no ordering guarantee, and offers O(1)
+average add/contains. `LinkedHashSet` is a `HashSet` that also maintains a linked list through
+entries, preserving insertion order at a modest extra cost. `TreeSet` is backed by a red-black
+tree, keeps elements in sorted order (natural or via a `Comparator`), at O(log n) instead of O(1)
+per operation.
 
 </details>
 
@@ -224,7 +398,7 @@ write to different bins concurrently instead of contending on a single lock.
 
 Full explanation → [Collections Framework](../java-core/03-collections-framework.md)
 
-## Exception Handling (6 questions)
+## Exception Handling (8 questions)
 
 <details id="checked-vs-unchecked-exceptions">
 <summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between checked and unchecked exceptions, and how does that shape method signature design?</summary>
@@ -233,6 +407,16 @@ Checked exceptions (subclasses of `Exception`, excluding `RuntimeException`) mus
 declared — meant for expected, recoverable conditions the caller should be forced to consider.
 Unchecked exceptions (`RuntimeException`/`Error`) need no declaration — meant for programming
 errors that shouldn't force every method up the chain to declare a `throws` clause.
+
+</details>
+
+<details id="throw-vs-throws">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `throw` and `throws`?</summary>
+
+`throw` is a statement that actually raises a specific exception instance right where it executes,
+immediately transferring control to the nearest matching `catch`. `throws` is a method-signature
+declaration listing checked exception types the method might propagate — it doesn't raise
+anything itself, it just obligates callers to handle or re-declare them.
 
 </details>
 
@@ -252,6 +436,17 @@ as a suppressed exception rather than replacing the original.
 Almost always — even on return, throw, or break/continue — but not if the JVM process is killed
 (`System.exit()`, `Runtime.halt()`, an external kill) or the executing thread dies from an uncaught
 `Error`. Also watch for a `return` inside `finally` silently overriding a `return` from `try`.
+
+</details>
+
+<details id="final-vs-finally-vs-finalize">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `final`, `finally`, and `finalize`?</summary>
+
+Three keywords that share letters and nothing else. `final` is a modifier preventing subclassing
+(on a class), overriding (on a method), or reassignment (on a variable). `finally` is a block
+attached to `try`/`catch` that runs regardless of success, return, or exception, used for
+deterministic cleanup. `finalize()` is a deprecated `Object` method the GC used to call before
+reclaiming an object, with no timing guarantee — replaced by `AutoCloseable`/try-with-resources.
 
 </details>
 
@@ -288,7 +483,17 @@ discarding it.
 
 Full explanation → [Exception Handling](../java-core/04-exception-handling.md)
 
-## Concurrency (6 questions)
+## Concurrency (9 questions)
+
+<details id="process-vs-thread">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between a process and a thread?</summary>
+
+A process is an independently running program with its own isolated memory space. A thread is the
+smallest unit of execution within a process — multiple threads in the same process share that
+process's heap and static state but each still has its own call stack, program counter, and local
+variables, which is exactly why shared heap objects need explicit synchronization between threads.
+
+</details>
 
 <details id="runnable-vs-thread">
 <summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between implementing Runnable and extending Thread?</summary>
@@ -299,6 +504,16 @@ same task can also be submitted to an `ExecutorService` instead of always spawni
 
 </details>
 
+<details id="start-vs-run">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between calling `start()` and calling `run()` on a Thread?</summary>
+
+`start()` asks the JVM/OS to allocate a genuinely new thread, which then invokes `run()` on it —
+the only way to get real concurrent execution. Calling `run()` directly is just an ordinary method
+call on whatever thread called it, executing synchronously with no new thread involved.
+Calling `start()` twice on the same `Thread` object throws `IllegalThreadStateException`.
+
+</details>
+
 <details id="synchronized-vs-lock">
 <summary><span className="qb-badge qb-badge--core">Core</span>What does the `synchronized` keyword actually guarantee, and how does it differ from using a `Lock`?</summary>
 
@@ -306,6 +521,17 @@ same task can also be submitted to an `ExecutorService` instead of always spawni
 lock, and releases automatically even on exception. `Lock` (e.g. `ReentrantLock`) gives the same
 mutual exclusion plus `tryLock()`, interruptible waiting, fairness, and multiple conditions — but
 must be released manually, always in a `finally`.
+
+</details>
+
+<details id="wait-sleep-yield">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `wait()`, `sleep()`, and `yield()`?</summary>
+
+`wait()` (on `Object`, only callable while holding that object's monitor) releases the lock and
+suspends the thread until `notify()`/`notifyAll()` is called on the same object. `sleep()` (a
+static `Thread` method) pauses the current thread for a fixed duration **without** releasing any
+locks it holds. `yield()` is just a hint to the scheduler that the thread is willing to let others
+run — the JVM can ignore it entirely, with no timing guarantee.
 
 </details>
 
@@ -351,7 +577,18 @@ with no such edge can still be observed out of order.
 
 Full explanation → [Concurrency](../java-core/05-concurrency.md)
 
-## Generics & Type Erasure (6 questions)
+## Generics & Type Erasure (7 questions)
+
+<details id="what-are-generics">
+<summary><span className="qb-badge qb-badge--core">Core</span>What are generics, and what problem do they solve?</summary>
+
+Generics (Java 5+) let a class, interface, or method be parameterized over a type, so the compiler
+enforces type consistency at compile time instead of relying on runtime casts. Before generics,
+collections held plain `Object`, so retrieving an element required an explicit cast that could
+fail at runtime, far from the actual insertion mistake. Generics move that error to compile time
+and remove the need for the cast entirely.
+
+</details>
 
 <details id="type-erasure">
 <summary><span className="qb-badge qb-badge--core">Core</span>What is type erasure, and what does it mean for generics at runtime?</summary>
@@ -414,7 +651,7 @@ erased type parameter, so it rejects it as a duplicate method.
 
 Full explanation → [Generics & Type Erasure](../java-core/06-generics-and-type-erasure.md)
 
-## Streams & Functional Interfaces (6 questions)
+## Streams & Functional Interfaces (7 questions)
 
 <details id="functional-interfaces-and-lambdas">
 <summary><span className="qb-badge qb-badge--core">Core</span>What's a functional interface, and how does a lambda expression relate to it?</summary>
@@ -432,6 +669,18 @@ Intermediate operations (`filter`, `map`, `sorted`) return another stream and ar
 record a pipeline step. Terminal operations (`collect`, `forEach`, `count`) trigger actual
 traversal and produce a non-stream result. A stream pipeline with no terminal operation does no
 work at all.
+
+</details>
+
+<details id="collectors-reduce-flatmap">
+<summary><span className="qb-badge qb-badge--core">Core</span>What do `Collectors.groupingBy`/`partitioningBy`/`toMap`, `reduce`, and `flatMap` each do, and when would you reach for each?</summary>
+
+`groupingBy` buckets elements into a `Map` by a classifier function (like SQL's `GROUP BY`);
+`partitioningBy` is the two-bucket special case keyed by a boolean predicate; `toMap` builds a
+`Map` from explicit key/value extractors and throws on duplicate keys unless given a merge
+function. `reduce` combines all elements into one value by repeatedly applying a combining
+function. `flatMap` handles elements that each produce their own stream (e.g. a list of lists),
+mapping and flattening in one step instead of leaving a `Stream<Stream<T>>`.
 
 </details>
 
@@ -477,7 +726,18 @@ stream from the source; the source collection itself is unaffected.
 
 Full explanation → [Streams & Functional Interfaces](../java-core/07-streams-and-functional-interfaces.md)
 
-## Strings & Object Contracts (6 questions)
+## Strings & Object Contracts (7 questions)
+
+<details id="equality-operator-vs-equals-method">
+<summary><span className="qb-badge qb-badge--core">Core</span>What's the difference between `==` and `.equals()` when comparing objects?</summary>
+
+`==` compares references — whether two variables point at the exact same object in memory.
+`.equals()`, when properly overridden, compares content — whether two objects are logically
+equivalent even if they're different instances. `Object`'s default `.equals()` just falls back to
+reference comparison unless a class overrides it, which is why relying on the default for a custom
+class silently behaves just like `==`.
+
+</details>
 
 <details id="why-string-is-immutable">
 <summary><span className="qb-badge qb-badge--core">Core</span>Why is String immutable in Java, and what benefits does that provide?</summary>
@@ -505,7 +765,10 @@ pooled instance explicitly.
 Inside a loop: because String is immutable, `result += s` per iteration allocates an entirely new
 String and copies everything each time, making the loop O(n²). `StringBuilder` holds a mutable
 buffer and appends in O(1) amortized time. A single one-off `a + b + c` expression is fine — the
-compiler already compiles it into an equivalent StringBuilder chain.
+compiler already compiles it into an equivalent StringBuilder chain. Prefer `StringBuilder` in
+single-threaded code; `StringBuffer` offers the identical API but synchronizes every method for
+thread safety, at a performance cost that's wasted unless the buffer is actually shared across
+threads.
 
 </details>
 
